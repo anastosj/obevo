@@ -120,9 +120,10 @@
 
         <!-- common dependency version properties -->
         <slf4j.version>1.7.18</slf4j.version>
-        <eclipsecollections.version>7.0.2</eclipsecollections.version>
+        <eclipsecollections.version>8.2.0</eclipsecollections.version>
 
-        <extra-enforcer-rules.version>1.0-beta-6</extra-enforcer-rules.version>
+        <extra-enforcer-rules.version>1.0-beta-7</extra-enforcer-rules.version>
+        <jaxb.version>2.3.1</jaxb.version>
 
         <sonar.exclusions>file:**/generated-sources/**/*</sonar.exclusions>
         <dbCredsFile />  <!-- empty by default -->
@@ -297,8 +298,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -426,7 +427,7 @@
                             <rules>
                                 <reactorModuleConvergence />
                                 <requireJavaVersion>
-                                    <version>1.7.0</version>
+                                    <version>17</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>3.5.0</version>
@@ -580,7 +581,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
-                <version>1.16</version>
+                <version>1.20</version>
                 <configuration>
                     <signature>
                         <groupId>org.codehaus.mojo.signature</groupId>
@@ -664,6 +665,18 @@
                     </includeScopes>
                     <excludeOptional>true</excludeOptional>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>${jaxb.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>${jaxb.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>check-license</id>
