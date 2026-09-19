@@ -15,6 +15,8 @@
  */
 package com.gs.obevo.api.factory;
 
+import java.lang.reflect.InvocationTargetException;
+
 import com.gs.obevo.api.platform.DeployerRuntimeException;
 import com.gs.obevo.api.platform.Platform;
 import org.apache.commons.configuration2.ImmutableHierarchicalConfiguration;
@@ -68,10 +70,14 @@ public class PlatformConfiguration {
                 resolvedDbPlatformClass = dbPlatformStr;
             }
 
-            return (Platform) Class.forName(resolvedDbPlatformClass).newInstance();
+            return (Platform) Class.forName(resolvedDbPlatformClass).getDeclaredConstructor().newInstance();
         } catch (InstantiationException e) {
             throw new DeployerRuntimeException(e);
         } catch (IllegalAccessException e) {
+            throw new DeployerRuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new DeployerRuntimeException(e);
+        } catch (InvocationTargetException e) {
             throw new DeployerRuntimeException(e);
         } catch (ClassNotFoundException e) {
             throw new DeployerRuntimeException("Could not find platform named " + dbPlatformStr + "; no class found and name was not in the list of default platform strings: " + platformConfigs.keysView());
