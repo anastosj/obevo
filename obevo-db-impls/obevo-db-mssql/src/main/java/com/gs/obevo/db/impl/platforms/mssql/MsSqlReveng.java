@@ -101,10 +101,11 @@ public class MsSqlReveng extends AbstractDdlReveng {
         out.println("    . .\\SqlServerDdlRevEng.ps1");
         out.println("");
         out.println("4) Run the following command to generate the DDL file:");
-        out.println(getCommandWithDefaults(args, "<username>", "<password>", "<dbHost>", "<database>", "<outputFile>"));
+        out.println(getCommandWithDefaults(args, "<username>", "<dbHost>", "<database>", "<outputFile>"));
+        out.println("    (replace <password> with your actual password when running the command)");
         out.println("");
         out.println("Here is an example command (in case your input arguments are not filled in):");
-        out.println(getCommandWithDefaults(args, "myuser", "mypassword", "myhost.me.com", "mydatabase", "H:\\db2-ddl-output.txt"));
+        out.println(getCommandWithDefaults(args, "myuser", "myhost.me.com", "mydatabase", "H:\\db2-ddl-output.txt"));
         out.println("");
         out.println("*******");
         out.println("NOTE - This script is still in beta and subject to signature changes.");
@@ -129,12 +130,12 @@ public class MsSqlReveng extends AbstractDdlReveng {
 //        return sQuote + inputSchema + eQuote + "." + sQuote + objectName + eQuote;
     }
 
-    private String getCommandWithDefaults(AquaRevengArgs args, String username, String password, String dbHost, String dbSchema, String outputFile) {
+    private String getCommandWithDefaults(AquaRevengArgs args, String username, String dbHost, String dbSchema, String outputFile) {
         return "    SqlServerDdlRevEng " +
                 " " + ObjectUtils.defaultIfNull(args.getOutputPath(), outputFile) +
                 " " + ObjectUtils.defaultIfNull(args.getDbHost(), dbHost) +
                 " " + ObjectUtils.defaultIfNull(args.getDbSchema(), dbSchema) +
                 " " + ObjectUtils.defaultIfNull(args.getUsername(), username) +
-                " " + ObjectUtils.defaultIfNull(args.getPassword(), password);
+                " <password>";
     }
 }
