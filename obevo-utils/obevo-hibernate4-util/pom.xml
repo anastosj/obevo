@@ -32,7 +32,24 @@
     <properties>
         <jacoco.minCoverage>0.70</jacoco.minCoverage>
         <hibernate.version>4.3.11.Final</hibernate.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>17</release>
+                    <source combine.self="override">17</source>
+                    <target combine.self="override">17</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
