@@ -40,14 +40,14 @@ deploy:
     skip_cleanup: true
     on:
       all_branches: true
-      condition: $DEPLOY_ENABLED == true
+      condition: $DEPLOY_ENABLED == true && $TRAVIS_JDK_VERSION == openjdk17
   - provider: pages
     skip_cleanup: true
     github-token: $GH_TOKEN
     local-dir: obevo-site/target/site
     on:
       all_branches: true
-      condition: $RELEASE_ENABLED == true
+      condition: $RELEASE_ENABLED == true && $TRAVIS_JDK_VERSION == openjdk17
   - provider: releases
     skip_cleanup: true
     api_key: $GH_TOKEN
@@ -56,4 +56,4 @@ deploy:
     file: obevo-dists/obevo-cli/target/obevo-cli-*-dist.zip
     on:
       all_branches: true
-      condition: $DEPLOY_ENABLED == true
+      condition: $DEPLOY_ENABLED == true && $TRAVIS_JDK_VERSION == openjdk17
