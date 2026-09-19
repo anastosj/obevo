@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+### Technical Improvements
+
+Build compiles to Java 8 bytecode and is tested on both JDK 8 and JDK 17 in CI
+
 ## 8.2.0
 
 ### Functionality Improvements
