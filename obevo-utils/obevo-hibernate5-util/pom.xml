@@ -32,9 +32,17 @@
     <properties>
         <jacoco.minCoverage>0.70</jacoco.minCoverage>
         <hibernate.version>5.4.0.Final</hibernate.version>
+        <!-- This module targets Java 17; the Kotlin version inherited from the root does not support jvmTarget 17 -->
+        <hibernate5.java.version>17</hibernate5.java.version>
+        <hibernate5.kotlin.version>1.9.25</hibernate5.kotlin.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${hibernate5.kotlin.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.goldmansachs.obevo</groupId>
             <artifactId>obevo-hibernate-util</artifactId>
@@ -79,6 +87,33 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${hibernate5.kotlin.version}</version>
+                <configuration>
+                    <jvmTarget>${hibernate5.java.version}</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${hibernate5.java.version}</source>
+                    <target>${hibernate5.java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- The Java 8 API signature check does not apply to a Java 17 module -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>verify</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
