@@ -1,7 +1,9 @@
 sudo: required  # required for docker usage in the build
 
 language: java
-jdk: openjdk17
+jdk:
+  - openjdk8
+  - openjdk17
 
 services:
   - docker
