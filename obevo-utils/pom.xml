@@ -37,9 +37,36 @@
         <module>obevo-db-unittest-util</module>
         <module>obevo-reladomo-util</module>
         <module>obevo-hibernate-util</module>
-        <module>obevo-hibernate3-util</module>
         <module>obevo-hibernate4-util</module>
         <module>obevo-hibernate5-util</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes combine.children="append">
+                        <!-- Scanned by the module itself; needed for JDKs where the module is not part of the reactor -->
+                        <exclude>obevo-hibernate3-util/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- obevo-hibernate3-util targets Java 17, so it is only built when running on JDK 17+ -->
+            <id>jdk17-modules</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <modules>
+                <module>obevo-hibernate3-util</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>

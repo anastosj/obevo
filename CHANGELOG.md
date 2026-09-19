@@ -6,6 +6,8 @@
 
 Build compiles to Java 8 bytecode and is tested on both JDK 8 and JDK 17 in CI
 
+obevo-hibernate3-util now targets Java 17 (compiled with `--release 17`; built only on JDK 17+)
+
 ## 8.2.0
 
 ### Functionality Improvements
