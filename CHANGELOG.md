@@ -6,6 +6,8 @@
 
 Build compiles to Java 8 bytecode and is tested on both JDK 8 and JDK 17 in CI
 
+Added unit test coverage for com.gs.obevo.util.CollectionUtil
+
 ## 8.2.0
 
 ### Functionality Improvements
