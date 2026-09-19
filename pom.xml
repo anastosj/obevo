@@ -324,7 +324,7 @@
                             ASE tests executing before IQ tests as the JDBC4 driver should get loaded first
                             before JDBC 3 for both those tests to work -->
                             <runOrder>alphabetical</runOrder>
-                            <argLine>-Xmx1024m -XX:MaxPermSize=256m @{jacoco.agent.it.arg}</argLine>
+                            <argLine>-Xmx1024m @{jacoco.agent.it.arg}</argLine>
                         </configuration>
                     </execution>
                 </executions>
