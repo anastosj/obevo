@@ -4,7 +4,7 @@
 
 ### Technical Improvements
 
-Build compiles to Java 8 bytecode and is tested on both JDK 8 and JDK 17 in CI
+Build now requires JDK 17: all modules compile with `--release 17`, the JDK 8 CI job and the Java 8 API check (animal-sniffer) are removed
 
 ## 8.2.0
 
