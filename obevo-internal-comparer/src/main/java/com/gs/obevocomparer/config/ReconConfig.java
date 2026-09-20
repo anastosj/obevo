@@ -17,6 +17,7 @@ package com.gs.obevocomparer.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ReconConfig {
 
@@ -124,19 +125,19 @@ public class ReconConfig {
         return this.allFields.stream()
                 .filter(ReconFieldConfig::isKey)
                 .map(ReconFieldConfig::getName)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public List<String> getFields() {
         return this.allFields.stream()
                 .map(ReconFieldConfig::getName)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public List<String> getExcludedFields() {
         return this.allFields.stream()
                 .filter(ReconFieldConfig::isExcluded)
                 .map(ReconFieldConfig::getName)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
