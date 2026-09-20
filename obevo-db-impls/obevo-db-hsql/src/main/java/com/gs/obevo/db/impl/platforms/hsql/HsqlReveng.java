@@ -18,18 +18,12 @@ package com.gs.obevo.db.impl.platforms.hsql;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
 
 import com.gs.obevo.api.platform.ChangeType;
 import com.gs.obevo.apps.reveng.AquaRevengArgs;
 import com.gs.obevo.apps.reveng.RevengPattern;
-import com.gs.obevo.apps.reveng.RevengPattern.NamePatternType;
-import com.gs.obevo.db.api.appdata.DbEnvironment;
 import com.gs.obevo.db.apps.reveng.AbstractDdlReveng;
-import com.gs.obevo.db.impl.core.jdbc.JdbcDataSourceFactory;
 import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
 import com.gs.obevo.util.inputreader.Credential;
 import org.eclipse.collections.api.block.predicate.Predicate;
@@ -68,9 +62,9 @@ public class HsqlReveng extends AbstractDdlReveng {
     }
 
     private static ImmutableList<RevengPattern> getRevengPatterns() {
-        String schemaNameSubPattern = getSchemaObjectPattern(QUOTE, QUOTE);
-        String schemaSysNamePattern = getSchemaObjectWithPrefixPattern(QUOTE, QUOTE, "SYS_");
-        NamePatternType namePatternType = RevengPattern.NamePatternType.TWO;
+        var schemaNameSubPattern = getSchemaObjectPattern(QUOTE, QUOTE);
+        var schemaSysNamePattern = getSchemaObjectWithPrefixPattern(QUOTE, QUOTE, "SYS_");
+        var namePatternType = RevengPattern.NamePatternType.TWO;
         return Lists.immutable.with(
                 new RevengPattern(ChangeType.SEQUENCE_STR, namePatternType, "(?i)create\\s+(?:or\\s+replace\\s+)?sequence\\s+" + schemaNameSubPattern).withPostProcessSql(REPLACE_TABLESPACE).withPostProcessSql(REMOVE_QUOTES),
                 new RevengPattern(ChangeType.TABLE_STR, namePatternType, "(?i)create\\s+(?:memory\\s+)table\\s+" + schemaNameSubPattern).withPostProcessSql(REPLACE_TABLESPACE).withPostProcessSql(REMOVE_QUOTES),
@@ -88,17 +82,17 @@ public class HsqlReveng extends AbstractDdlReveng {
 
     @Override
     protected boolean doRevengOrInstructions(PrintStream out, AquaRevengArgs args, File interimDir) {
-        DbEnvironment env = getDbEnvironment(args);
+        var env = getDbEnvironment(args);
 
-        JdbcDataSourceFactory jdbcFactory = new HsqlJdbcDataSourceFactory();
-        DataSource ds = jdbcFactory.createDataSource(env, new Credential(args.getUsername(), args.getPassword()), 1);
-        JdbcHelper jdbc = new JdbcHelper(null, false);
+        var jdbcFactory = new HsqlJdbcDataSourceFactory();
+        var ds = jdbcFactory.createDataSource(env, new Credential(args.getUsername(), args.getPassword()), 1);
+        var jdbc = new JdbcHelper(null, false);
 
         interimDir.mkdirs();
-        try (Connection conn = ds.getConnection()) {
+        try (var conn = ds.getConnection()) {
             // https://docs.oracle.com/database/121/ARPLS/d_metada.htm#BGBJBFGE
             // Note - can't remap schema name, object name, tablespace name within JDBC calls; we will leave that to the existing code in AbstractReveng
-            File outputFile = new File(interimDir, "output.sql");
+            var outputFile = new File(interimDir, "output.sql");
             outputFile.delete();  // clean before creating
             jdbc.update(conn, "SCRIPT '" + outputFile.getCanonicalPath() + "'");
         } catch (SQLException | IOException e) {

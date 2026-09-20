@@ -19,7 +19,6 @@ import java.io.File;
 
 import com.gs.obevo.apps.reveng.AbstractRevengTest;
 import com.gs.obevo.apps.reveng.AquaRevengArgs;
-import com.gs.obevo.db.api.appdata.DbEnvironment;
 import com.gs.obevo.db.api.factory.DbEnvironmentFactory;
 import com.gs.obevo.testutil.DirectoryAssert;
 import org.apache.commons.io.FileUtils;
@@ -29,14 +28,14 @@ public class HsqlRevengTest extends AbstractRevengTest {
     @Test
     @Override
     public void testReverseEngineeringFromFile() throws Exception {
-        AquaRevengArgs args = new AquaRevengArgs();
+        var args = new AquaRevengArgs();
         args.setDbSchema("MYSCHEMA01");
         args.setGenerateBaseline(false);
         args.setJdbcUrl("jdbc:hsqldb:mem:hsqldbreveng");
         args.setUsername("myuser");
         args.setPassword("mypass");
 
-        File outputDir = new File("./target/outputReveng");
+        var outputDir = new File("./target/outputReveng");
         FileUtils.deleteDirectory(outputDir);
         args.setOutputPath(outputDir);
 
@@ -47,7 +46,7 @@ public class HsqlRevengTest extends AbstractRevengTest {
         DirectoryAssert.assertDirectoriesEqual(new File("./src/test/resources/reveng/hsql/expected"), new File(outputDir, "final"));
 
         // Ensure that we can still build the schema that was reverse engineered
-        DbEnvironment prod = DbEnvironmentFactory.getInstance().readOneFromSourcePath(new File(outputDir, "final").getAbsolutePath(), "prod");
+        var prod = DbEnvironmentFactory.getInstance().readOneFromSourcePath(new File(outputDir, "final").getAbsolutePath(), "prod");
         prod.setCleanBuildAllowed(true);
         prod.buildAppContext("sa", "")
                 .setupEnvInfra()

@@ -20,7 +20,6 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 
 import com.gs.obevo.api.appdata.PhysicalSchema;
-import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
 import com.gs.obevo.db.impl.platforms.AbstractSqlExecutor;
 
 public class HsqlSqlExecutor extends AbstractSqlExecutor {
@@ -30,7 +29,7 @@ public class HsqlSqlExecutor extends AbstractSqlExecutor {
 
     @Override
     public void setDataSourceSchema(Connection conn, PhysicalSchema schema) {
-        JdbcHelper jdbc = this.getJdbcTemplate();
+        var jdbc = this.getJdbcTemplate();
         jdbc.update(conn, "SET INITIAL SCHEMA " + schema.getPhysicalName());
         jdbc.update(conn, "SET SCHEMA " + schema.getPhysicalName());
     }

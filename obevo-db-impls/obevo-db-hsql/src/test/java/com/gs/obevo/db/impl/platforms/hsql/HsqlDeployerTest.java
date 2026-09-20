@@ -16,16 +16,13 @@
 package com.gs.obevo.db.impl.platforms.hsql;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.gs.obevo.api.factory.Obevo;
-import com.gs.obevo.db.api.appdata.DbEnvironment;
-import com.gs.obevo.db.api.platform.DbDeployerAppContext;
 import com.gs.obevo.apps.reveng.AquaRevengArgs;
+import com.gs.obevo.db.api.appdata.DbEnvironment;
 import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
 import com.gs.obevo.db.unittest.UnitTestDbBuilder;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -42,7 +39,7 @@ public class HsqlDeployerTest {
     @Test
     public void testDeploy() throws Exception {
         DbEnvironment env = Obevo.readEnvironment("./src/test/resources/platforms/hsql/step1");
-        DbDeployerAppContext context = env.buildAppContext("sa", "");
+        var context = env.buildAppContext("sa", "");
 
         context.setupEnvInfra();
         context.cleanEnvironment();
@@ -53,23 +50,17 @@ public class HsqlDeployerTest {
 
         this.setup();
         // simple test to assert that the table has been created
-        int result;
-        Connection conn = context.getDataSource().getConnection();
-        try {
-            result = this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.TABLE_A");
-            assertEquals(3, result);
-            result = this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.VIEW1");
-            assertEquals(3, result);
+        try (var conn = context.getDataSource().getConnection()) {
+            assertEquals(3, this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.TABLE_A"));
+            assertEquals(3, this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.VIEW1"));
             // String columnListSql =
             // "select name from syscolumns where id in (select id from sysobjects where name = 'TEST_TABLE')";
             // List<String> columnsInTestTable = db2JdbcTemplate.query(columnListSql, new SingleColumnRowMapper<String>());
             // Assert.assertEquals(Lists.mutable.with("ID", "STRING", "MYNEWCOL"), FastList.newList(columnsInTestTable));
-        } finally {
-            DbUtils.closeQuietly(conn);
         }
 
         // Test out reverse engineering
-        AquaRevengArgs args = new AquaRevengArgs();
+        var args = new AquaRevengArgs();
         args.setDbSchema("DBDEPLOY01");
         args.setGenerateBaseline(false);
         //args.setJdbcUrl("jdbc:hsqldb:hsql://localhost:9092/myserver");
@@ -77,7 +68,7 @@ public class HsqlDeployerTest {
         args.setUsername("sa");
         args.setPassword("");
 
-        File outputDir = new File("./target/outputRevengNew");
+        var outputDir = new File("./target/outputRevengNew");
         FileUtils.deleteDirectory(outputDir);
         args.setOutputPath(outputDir);
 
@@ -86,7 +77,7 @@ public class HsqlDeployerTest {
 
     @Test
     public void testUnitTestDeploy() throws SQLException {
-        DbDeployerAppContext context = UnitTestDbBuilder.newBuilder()
+        var context = UnitTestDbBuilder.newBuilder()
                 .setEnvName("test2")
                 .setDbPlatform(new HsqlDbPlatform())
                 .setSourcePath("platforms/hsql/step1")
@@ -98,19 +89,13 @@ public class HsqlDeployerTest {
         context.cleanAndDeploy();
         context.cleanAndDeploy();
 
-        DbEnvironment env = context.getEnvironment();
+        var env = context.getEnvironment();
         System.out.println("Created env at " + env.getJdbcUrl());
-        int result;
 
         this.setup();
-        Connection conn = context.getDataSource().getConnection();
-        try {
-            result = this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.TABLE_A");
-            assertEquals(3, result);
-            result = this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.VIEW1");
-            assertEquals(3, result);
-        } finally {
-            DbUtils.closeQuietly(conn);
+        try (var conn = context.getDataSource().getConnection()) {
+            assertEquals(3, this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.TABLE_A"));
+            assertEquals(3, this.jdbc.queryForInt(conn, "select count(*) from DBDEPLOY01.VIEW1"));
         }
     }
 }

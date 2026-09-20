@@ -21,7 +21,6 @@ import java.io.IOException;
 import com.gs.obevo.api.platform.DeployerRuntimeException;
 import com.gs.obevo.db.api.appdata.DbEnvironment;
 import com.gs.obevo.db.impl.core.jdbc.JdbcDataSourceFactory;
-import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.map.ConcurrentMutableMap;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
@@ -29,7 +28,7 @@ public class HsqlJdbcDataSourceFactory extends JdbcDataSourceFactory {
     private static final String HSQL_FILE_PLACEHOLDER = ".zzz";
 
     // We'd like to reuse the same DB file for consistency if we go w/ the same environment
-    private static final ConcurrentMutableMap<String, String> dbNameToFileUrlMap = new ConcurrentHashMap<String, String>();
+    private static final ConcurrentMutableMap<String, String> dbNameToFileUrlMap = new ConcurrentHashMap<>();
 
     @Override
     protected String createUrl(DbEnvironment env) {
@@ -47,19 +46,14 @@ public class HsqlJdbcDataSourceFactory extends JdbcDataSourceFactory {
 
     private static String getUrl(final String dbName, final boolean persistToFile) {
         String key = dbName + ":" + persistToFile;
-        return dbNameToFileUrlMap.getIfAbsentPut(key, new Function0<String>() {
-            @Override
-            public String value() {
-                return getUrlUncached(dbName, persistToFile);
-            }
-        });
+        return dbNameToFileUrlMap.getIfAbsentPut(key, () -> getUrlUncached(dbName, persistToFile));
     }
 
     private static String getUrlUncached(String dbName, boolean persistToFile) {
         if (persistToFile) {
             try {
-                File tmpPlaceholder = File.createTempFile("hsqldb" + dbName, HSQL_FILE_PLACEHOLDER);
-                File tmpDbFile = new File(tmpPlaceholder.getParentFile(), tmpPlaceholder.getName().substring(0,
+                var tmpPlaceholder = File.createTempFile("hsqldb" + dbName, HSQL_FILE_PLACEHOLDER);
+                var tmpDbFile = new File(tmpPlaceholder.getParentFile(), tmpPlaceholder.getName().substring(0,
                         tmpPlaceholder.getName().length() - HSQL_FILE_PLACEHOLDER.length()));
 
                 return String.format("jdbc:hsqldb:file:%1$s", tmpDbFile.getAbsolutePath());

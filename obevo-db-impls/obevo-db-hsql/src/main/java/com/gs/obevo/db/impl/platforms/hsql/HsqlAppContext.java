@@ -19,17 +19,11 @@ import com.gs.obevo.db.api.platform.SqlExecutor;
 import com.gs.obevo.db.impl.core.DbDeployerAppContextImpl;
 import com.gs.obevo.db.impl.core.envinfrasetup.EnvironmentInfraSetup;
 import com.gs.obevo.db.impl.core.jdbc.DataSourceFactory;
-import org.eclipse.collections.api.block.function.Function0;
 
 public class HsqlAppContext extends DbDeployerAppContextImpl {
 
     public SqlExecutor getSqlExecutor() {
-        return this.singleton("getSqlExecutor", new Function0<SqlExecutor>() {
-            @Override
-            public SqlExecutor value() {
-                return new HsqlSqlExecutor(getManagedDataSource());
-            }
-        });
+        return this.singleton("getSqlExecutor", () -> new HsqlSqlExecutor(this.getManagedDataSource()));
     }
 
     @Override
