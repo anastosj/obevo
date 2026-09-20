@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.apps.reveng;
 
 import java.io.File;
@@ -58,20 +63,17 @@ public class AseDdlgenReveng extends AbstractDdlReveng {
                         StringPredicates.startsWith("exec sp_addalias"),
                         StringPredicates.startsWith("-- DDLGen Completed")),
                 getRevengPatterns(),
-                new Procedure2<ChangeEntry, String>() {
-                    @Override
-                    public void value(ChangeEntry changeEntry, String sql) {
-                        if (sql.contains("\"")) {
-                            changeEntry.addMetadataAnnotation(TextMarkupDocumentReader.TOGGLE_DISABLE_QUOTED_IDENTIFIERS);
-                        }
+                (Procedure2<ChangeEntry, String>) (changeEntry, sql) -> {
+                    if (sql.contains("\"")) {
+                        changeEntry.addMetadataAnnotation(TextMarkupDocumentReader.TOGGLE_DISABLE_QUOTED_IDENTIFIERS);
                     }
                 }
         );
     }
 
     private static ImmutableList<RevengPattern> getRevengPatterns() {
-        String nameSubPattern = getCatalogSchemaObjectPattern("", "");
-        NamePatternType namePatternType = RevengPattern.NamePatternType.THREE;
+        var nameSubPattern = getCatalogSchemaObjectPattern("", "");
+        var namePatternType = NamePatternType.THREE;
         return Lists.immutable.with(
                 new RevengPattern(ChangeType.SEQUENCE_STR, namePatternType, "(?i)create\\s+seq(?:uence)?\\s+" + nameSubPattern),
                 new RevengPattern(ChangeType.TABLE_STR, namePatternType, "(?i)create\\s+table\\s+" + nameSubPattern),

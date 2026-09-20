@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import com.gs.obevo.db.api.appdata.DbEnvironment;
@@ -29,6 +34,6 @@ public class AseJdbcDataSourceFactory extends JdbcDataSourceFactory {
     }
 
     private static String createAseUrl(String host, int port) {
-        return String.format("jdbc:sybase:Tds:%1$s:%2$s", host, port);
+        return "jdbc:sybase:Tds:%1$s:%2$s".formatted(host, port);
     }
 }

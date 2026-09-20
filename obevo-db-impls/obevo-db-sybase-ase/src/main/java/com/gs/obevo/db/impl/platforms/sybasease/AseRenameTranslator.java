@@ -13,9 +13,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.obevo.api.appdata.ChangeInput;
@@ -29,10 +33,10 @@ public class AseRenameTranslator implements UnparsedSqlTranslator {
 
     @Override
     public String handleRawFullSql(String sql, ChangeInput change) {
-        Matcher matcher = SP_RENAME_PATTERN.matcher(sql);
+        var matcher = SP_RENAME_PATTERN.matcher(sql);
         if (matcher.find()) {
             // prepend a space in case there is some text that comes up before this
-            String replacementSql = " ALTER TABLE " + matcher.group(1) + " ALTER COLUMN " + matcher.group(2) + " RENAME TO " + matcher.group(3);
+            var replacementSql = " ALTER TABLE " + matcher.group(1) + " ALTER COLUMN " + matcher.group(2) + " RENAME TO " + matcher.group(3);
             return matcher.replaceFirst(replacementSql);
         }
 

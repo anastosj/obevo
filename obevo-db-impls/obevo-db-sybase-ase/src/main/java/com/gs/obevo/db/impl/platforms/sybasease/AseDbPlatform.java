@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import java.sql.Connection;
@@ -145,9 +150,10 @@ public class AseDbPlatform extends AbstractDbPlatform {
 
     @Override
     public DbTranslationDialect getDbTranslationDialect(DbPlatform targetDialect) {
-        if (targetDialect.getClass().getName().equals("com.gs.obevo.db.impl.platforms.h2.H2DbPlatform")) {
+        var targetPlatformClassName = targetDialect.getClass().getName();
+        if (targetPlatformClassName.equals("com.gs.obevo.db.impl.platforms.h2.H2DbPlatform")) {
             return new AseToH2TranslationDialect();
-        } else if (targetDialect.getClass().getName().equals("com.gs.obevo.db.impl.platforms.hsql.HsqlDbPlatform")) {
+        } else if (targetPlatformClassName.equals("com.gs.obevo.db.impl.platforms.hsql.HsqlDbPlatform")) {
             return new AseToHsqlTranslationDialect();
         } else {
             return super.getDbTranslationDialect(targetDialect);

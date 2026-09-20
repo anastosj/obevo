@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import java.util.Arrays;
@@ -23,7 +28,6 @@ import com.gs.obevo.db.sqlparser.tokenparser.SqlToken;
 import com.gs.obevo.db.sqlparser.tokenparser.SqlTokenParser;
 import com.gs.obevo.db.sqlparser.tokenparser.SqlTokenType;
 import com.gs.obevo.impl.text.CommentRemover;
-import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.MutableList;
 
 public abstract class AseDomainSqlTranslator implements UnparsedSqlTranslator {
@@ -33,18 +37,13 @@ public abstract class AseDomainSqlTranslator implements UnparsedSqlTranslator {
         if (sql.startsWith("sp_addtype")) {
             // all the params are in string literals, e.g. 'param'. Let's extract it out
             MutableList<SqlToken> allParts = new SqlTokenParser().parseTokens(sql);
-            MutableList<SqlToken> parts = allParts.select(new Predicate<SqlToken>() {
-                @Override
-                public boolean accept(SqlToken it) {
-                    return it.getTokenType().equals(SqlTokenType.STRING);
-                }
-            });
+            MutableList<SqlToken> parts = allParts.select(it -> it.getTokenType().equals(SqlTokenType.STRING));
 
             String domainName = null;
             String domainType = null;
             String domainProps = null;
             for (int i = 0; i < parts.size(); i++) {
-                String part = this.stripAddTypeParam(parts.get(i).getText().trim());
+                var part = this.stripAddTypeParam(parts.get(i).getText().trim());
                 if (i == 0) {
                     domainName = part;
                 } else if (i == 1) {
@@ -66,8 +65,8 @@ public abstract class AseDomainSqlTranslator implements UnparsedSqlTranslator {
     protected abstract String createDomainSql(String domainName, String domainType, String domainProps);
 
     private String stripAddTypeParam(String param) {
-        int firstQuoteIndex = param.indexOf('\'');
-        int lastQuoteIndex = param.lastIndexOf('\'');
+        var firstQuoteIndex = param.indexOf('\'');
+        var lastQuoteIndex = param.lastIndexOf('\'');
         return param.substring(firstQuoteIndex + 1, lastQuoteIndex);
     }
 }

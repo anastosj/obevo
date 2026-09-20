@@ -13,9 +13,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.obevo.api.appdata.ChangeInput;
@@ -40,7 +44,7 @@ public class AseToHsqlSqlTranslator implements ColumnSqlTranslator, PostColumnSq
             }
         }
 
-        Matcher varbinaryDefaultMatcher = this.varbinaryDefaultPattern.matcher(string);
+        var varbinaryDefaultMatcher = this.varbinaryDefaultPattern.matcher(string);
         if (varbinaryDefaultMatcher.find()) {
             string = varbinaryDefaultMatcher.replaceFirst("varbinary(1)" + varbinaryDefaultMatcher.group(1));
         }
@@ -58,7 +62,7 @@ public class AseToHsqlSqlTranslator implements ColumnSqlTranslator, PostColumnSq
 
     @Override
     public CreateTableColumn handleColumn(CreateTableColumn column, CreateTable table) {
-        String colTypeName = column.getType().getTypeName();
+        var colTypeName = column.getType().getTypeName();
 
         // unlike H2, we cannot use "create domain" to translate univarchar to varchar, as HSQL doesn't support creating a new domain/user type as being parameterizable
         // Hence, we must do the renaming here.

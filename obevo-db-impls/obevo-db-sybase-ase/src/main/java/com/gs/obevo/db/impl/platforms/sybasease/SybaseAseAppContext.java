@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import com.gs.obevo.api.platform.ChangeType;
@@ -23,17 +28,11 @@ import com.gs.obevo.db.impl.core.envinfrasetup.EnvironmentInfraSetup;
 import com.gs.obevo.db.impl.core.jdbc.DataSourceFactory;
 import com.gs.obevo.impl.ChangeTypeBehaviorRegistry.ChangeTypeBehaviorRegistryBuilder;
 import com.gs.obevo.model.AseUserTypeChangeTypeBehavior;
-import org.eclipse.collections.api.block.function.Function0;
 
 public class SybaseAseAppContext extends DbDeployerAppContextImpl {
 
     public SqlExecutor getSqlExecutor() {
-        return this.singleton("getSqlExecutor", new Function0<AseSqlExecutor>() {
-            @Override
-            public AseSqlExecutor value() {
-                return new AseSqlExecutor(SybaseAseAppContext.this.getManagedDataSource());
-            }
-        });
+        return this.singleton("getSqlExecutor", () -> new AseSqlExecutor(this.getManagedDataSource()));
     }
 
     @Override
@@ -48,7 +47,7 @@ public class SybaseAseAppContext extends DbDeployerAppContextImpl {
 
     @Override
     protected ChangeTypeBehaviorRegistryBuilder getChangeTypeBehaviors() {
-        DbChangeType usertypeChangeType = (DbChangeType) platform().getChangeType(ChangeType.USERTYPE_STR);
+        var usertypeChangeType = (DbChangeType) platform().getChangeType(ChangeType.USERTYPE_STR);
         return super.getChangeTypeBehaviors()
                 .putBehavior(ChangeType.USERTYPE_STR, new AseUserTypeChangeTypeBehavior(env, usertypeChangeType, getSqlExecutor(), simpleArtifactDeployer(), grantChangeParser(), graphEnricher(), platform(), getDbMetadataManager()));
     }

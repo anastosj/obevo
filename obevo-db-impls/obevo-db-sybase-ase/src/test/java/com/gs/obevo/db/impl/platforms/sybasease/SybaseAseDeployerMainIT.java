@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import java.sql.Connection;
@@ -24,12 +29,9 @@ import javax.sql.DataSource;
 import com.gs.obevo.api.appdata.DeployExecution;
 import com.gs.obevo.api.appdata.DeployExecutionAttribute;
 import com.gs.obevo.api.appdata.DeployExecutionAttributeImpl;
-import com.gs.obevo.api.appdata.PhysicalSchema;
 import com.gs.obevo.api.platform.MainDeployerArgs;
 import com.gs.obevo.db.api.platform.DbDeployerAppContext;
 import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
-import org.apache.commons.dbutils.DbUtils;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Sets;
@@ -56,46 +58,41 @@ public class SybaseAseDeployerMainIT {
 
     @Test
     public void testAseDeploy() throws Exception {
-        MainDeployerArgs args1 = new MainDeployerArgs()
+        var args1 = new MainDeployerArgs()
                 .deployExecutionAttributes(Sets.immutable.<DeployExecutionAttribute>with(
                         new DeployExecutionAttributeImpl("attr1", "v1_val1"),
                         new DeployExecutionAttributeImpl("attr2", "v1_val2")
                 ))
                 .reason("try1");
 
-        DbDeployerAppContext context1 = getAppContext.valueOf(1);
+        var context1 = getAppContext.valueOf(1);
         context1
                 .cleanEnvironment()
                 .setupEnvInfra()
                 .deploy(args1);
 
-        String schema = "dbdeploy01";
-        PhysicalSchema physicalSchema = context1.getEnvironment().getPhysicalSchema(schema);
-        String schemaPrefix = context1.getEnvironment().getPlatform().getSchemaPrefix(physicalSchema);
+        var schema = "dbdeploy01";
+        var physicalSchema = context1.getEnvironment().getPhysicalSchema(schema);
+        var schemaPrefix = context1.getEnvironment().getPlatform().getSchemaPrefix(physicalSchema);
 
         this.validateStep1(ds, new JdbcHelper(), schemaPrefix);
-        DeployExecution execution1 = context1.getDeployExecutionDao().getLatestDeployExecution(schema);
+        var execution1 = context1.getDeployExecutionDao().getLatestDeployExecution(schema);
         verifyExecution1(execution1);
 
-        MainDeployerArgs args2 = new MainDeployerArgs()
+        var args2 = new MainDeployerArgs()
                 .deployExecutionAttributes(Sets.immutable.<DeployExecutionAttribute>with(
                         new DeployExecutionAttributeImpl("attr1", "v2_val1"),
                         new DeployExecutionAttributeImpl("attr2", "v2_val2"),
                         new DeployExecutionAttributeImpl("attr3", "v2_val3")
                 ))
                 .reason("try2");
-        DbDeployerAppContext context2 = getAppContext.valueOf(2);
+        var context2 = getAppContext.valueOf(2);
         context2.setupEnvInfra().deploy(args2);
         this.validateStep2(ds, new JdbcHelper(), schemaPrefix);
-        DeployExecution execution2 = context2.getDeployExecutionDao().getLatestDeployExecution(schema);
+        var execution2 = context2.getDeployExecutionDao().getLatestDeployExecution(schema);
         verifyExecution2(execution2);
 
-        MutableList<DeployExecution> executions = context2.getDeployExecutionDao().getDeployExecutions(schema).toSortedListBy(new Function<DeployExecution, Long>() {
-            @Override
-            public Long valueOf(DeployExecution deployExecution) {
-                return deployExecution.getId();
-            }
-        });
+        MutableList<DeployExecution> executions = context2.getDeployExecutionDao().getDeployExecutions(schema).toSortedListBy(DeployExecution::getId);
         verifyExecution1(executions.get(0));
         verifyExecution2(executions.get(1));
     }
@@ -116,11 +113,8 @@ public class SybaseAseDeployerMainIT {
 
     public static void validateStep1(DataSource ds, JdbcHelper jdbc, String schemaPrefix) throws Exception {
         List<Map<String, Object>> results;
-        Connection conn = ds.getConnection();
-        try {
+        try (Connection conn = ds.getConnection()) {
             results = jdbc.queryForList(conn, "select * from " + schemaPrefix + "TestTable order by idField");
-        } finally {
-            DbUtils.closeQuietly(conn);
         }
 
         assertEquals(4, results.size());
@@ -132,11 +126,8 @@ public class SybaseAseDeployerMainIT {
 
     public static void validateStep2(DataSource ds, JdbcHelper jdbc, String schemaPrefix) throws Exception {
         List<Map<String, Object>> results;
-        Connection conn = ds.getConnection();
-        try {
+        try (Connection conn = ds.getConnection()) {
             results = jdbc.queryForList(conn, "select * from " + schemaPrefix + "TestTable order by idField");
-        } finally {
-            DbUtils.closeQuietly(conn);
         }
 
         assertEquals(5, results.size());

@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.model;
 
 import java.sql.Connection;
@@ -41,6 +46,6 @@ public class AseUserTypeChangeTypeBehavior extends RerunnableDbChangeTypeBehavio
 
     @Override
     protected String generateDropChangeRaw(Connection conn, Change change) {
-        return String.format("sp_droptype N'%s'", change.getObjectName());
+        return "sp_droptype N'%s'".formatted(change.getObjectName());
     }
 }

@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import java.sql.Connection;
@@ -41,7 +46,7 @@ public class AseSqlExecutor extends AbstractSqlExecutor {
 
     @Override
     public void setDataSourceSchema(Connection conn, PhysicalSchema schema) {
-        JdbcHelper jdbc = this.getJdbcTemplate();
+        var jdbc = this.getJdbcTemplate();
         jdbc.update(conn, "use " + schema.getPhysicalName());
     }
 
@@ -62,7 +67,7 @@ public class AseSqlExecutor extends AbstractSqlExecutor {
         private static final int stopLogSpaceThreshold = 85;
         private static final int resumeLogSpaceThreshold = 40;
         private static final int maxLogCounter = 10;
-        private AtomicInteger curLogCounter = new AtomicInteger(0);
+        private final AtomicInteger curLogCounter = new AtomicInteger(0);
 
         @Override
         public void preUpdate(Connection conn, JdbcHelper jdbc) {
@@ -83,19 +88,18 @@ public class AseSqlExecutor extends AbstractSqlExecutor {
                 boolean firstTime = true;
 
                 while (true) {
-                    int percentFull = getPercentLogFullInDb(conn, jdbc);
+                    var percentFull = getPercentLogFullInDb(conn, jdbc);
 
-                    int thresholdToCheck = firstTime ? stopLogSpaceThreshold : resumeLogSpaceThreshold;
+                    var thresholdToCheck = firstTime ? stopLogSpaceThreshold : resumeLogSpaceThreshold;
                     firstTime = false;
 
                     if (percentFull < thresholdToCheck) {
                         break;
                     } else {
                         try {
-                            Seconds seconds = Seconds.seconds(3);
-                            LOG.info(String
-                                    .format("Pausing for %d seconds as the log level hit a high mark of %d; will resume when it gets back to %d",
-                                            seconds.getSeconds(), percentFull, resumeLogSpaceThreshold));
+                            var seconds = Seconds.seconds(3);
+                            LOG.info("Pausing for {} seconds as the log level hit a high mark of {}; will resume when it gets back to {}",
+                                    seconds.getSeconds(), percentFull, resumeLogSpaceThreshold);
                             Thread.sleep(seconds.getSeconds() * 1000);
                         } catch (InterruptedException e) {
                             throw new DeployerRuntimeException(e);

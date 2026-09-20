@@ -13,17 +13,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 public class AseToHsqlDomainSqlTranslator extends AseDomainSqlTranslator {
     @Override
     protected String createDomainSql(String domainName, String domainType, String domainProps) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("CREATE DOMAIN ").append(domainName).append(" AS ").append(domainType);
+        var sql = "CREATE DOMAIN " + domainName + " AS " + domainType;
         if (domainProps != null) {
-            sb.append(" CHECK (value is ").append(domainProps).append(")");
+            sql += " CHECK (value is " + domainProps + ")";
         }
 
-        return sb.toString();
+        return sql;
     }
 }

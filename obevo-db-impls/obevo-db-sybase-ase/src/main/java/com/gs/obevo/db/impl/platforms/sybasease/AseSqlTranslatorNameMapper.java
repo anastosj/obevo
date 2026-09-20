@@ -13,6 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
 package com.gs.obevo.db.impl.platforms.sybasease;
 
 import com.gs.obevo.db.impl.platforms.sqltranslator.SqlTranslatorNameMapper;
@@ -21,7 +26,7 @@ public class AseSqlTranslatorNameMapper implements SqlTranslatorNameMapper {
     @Override
     public String remapIndexName(String name, String tableName) {
         // when dropping an index, it must be qualified in ASE. Convert it to the in-mem convention
-        String[] nameParts = name.split("\\.");
+        var nameParts = name.split("\\.");
 
         String objectName;
         if (nameParts.length == 1) {
