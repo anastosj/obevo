@@ -77,9 +77,11 @@ public class DaColumnImpl implements DaColumn {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaColumnImpl daColumn6)) {
+        if (!(o instanceof DaColumnImpl)) {
             return false;
         }
+
+        DaColumnImpl daColumn6 = (DaColumnImpl) o;
 
         return column.equals(daColumn6.column);
     }

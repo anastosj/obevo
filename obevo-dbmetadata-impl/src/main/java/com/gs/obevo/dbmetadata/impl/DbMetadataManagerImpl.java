@@ -104,7 +104,7 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
         // Many of the DB metadata drivers like IQ/ASE/DB2 don't support the function metadata lookups and
         // schemacrawler complains (though the library still does the job). We set the log level here to avoid
         // excessive log messages
-        var thisLogger = java.util.logging.Logger.getLogger("schemacrawler");
+        java.util.logging.Logger thisLogger = java.util.logging.Logger.getLogger("schemacrawler");
         for (Handler handler : thisLogger.getHandlers()) {
             thisLogger.removeHandler(handler);
         }
@@ -115,23 +115,23 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
         try (Connection conn = this.ds.getConnection()) {
             this.dbMetadataDialect.setSchemaOnConnection(conn, physicalSchema);
 
-            var options = SchemaCrawlerOptionsBuilder.builder();
+            SchemaCrawlerOptionsBuilder options = SchemaCrawlerOptionsBuilder.builder();
 
             // Set what details are required in the schema - this affects the time taken to crawl the schema
             // Standard works for our use cases (e.g. columns, indices, pks)
-            var schemaInfoLevelBuilder = toInfoLevelBuilder(schemaInfoLevel);
+            SchemaInfoLevelBuilder schemaInfoLevelBuilder = toInfoLevelBuilder(schemaInfoLevel);
             this.dbMetadataDialect.updateSchemaInfoLevelBuilder(schemaInfoLevelBuilder);
             options.withLoadOptions(LoadOptionsBuilder.builder().withSchemaInfoLevel(schemaInfoLevelBuilder.toOptions()).toOptions());
 
-            var dbSpecificOptionsBuilder = dbMetadataDialect.getDbSpecificOptionsBuilder(conn, physicalSchema, searchAllTables);
+            SchemaRetrievalOptionsBuilder dbSpecificOptionsBuilder = dbMetadataDialect.getDbSpecificOptionsBuilder(conn, physicalSchema, searchAllTables);
             MutableMap<InformationSchemaKey, String> infoSchemaSqlOverrides = dbMetadataDialect.getInfoSchemaSqlOverrides(physicalSchema);
             if (infoSchemaSqlOverrides != null) {
-                var convertedInfoSchemaSqlOverrides = infoSchemaSqlOverrides.collect((key, value) -> Tuples.pair(key.getLookupKey(), value));
+                MutableMap<String, String> convertedInfoSchemaSqlOverrides = infoSchemaSqlOverrides.collect((key, value) -> Tuples.pair(key.getLookupKey(), value));
                 dbSpecificOptionsBuilder.withInformationSchemaViews(convertedInfoSchemaSqlOverrides);
             }
             SchemaRetrievalOptions dbSpecificOptions = dbSpecificOptionsBuilder.toOptions();
 
-            var limitOptions = LimitOptionsBuilderFixed.builder();
+            LimitOptionsBuilderFixed limitOptions = LimitOptionsBuilderFixed.builder();
             this.dbMetadataDialect.updateLimitOptionsBuilder(limitOptions);
 
             String schemaExpression = Objects.requireNonNull(this.dbMetadataDialect.getSchemaExpression(physicalSchema), "Schema expression was not returned for schema " + physicalSchema + " by " + dbMetadataDialect);
@@ -180,7 +180,7 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
 
             SchemaStrategy schemaStrategy = dbMetadataDialect.getSchemaStrategy();
             Schema schemaReference = database.getSchemas().isEmpty() ? null : database.getSchemas().iterator().next();
-            var schema = new DaSchemaImpl(schemaReference, schemaStrategy);
+            DaSchema schema = new DaSchemaImpl(schemaReference, schemaStrategy);
 
             ImmutableCollection<DaRoutine> extraRoutines = Lists.immutable.empty();
 
@@ -219,7 +219,7 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
     }
 
     private SchemaInfoLevelBuilder toInfoLevelBuilder(DaSchemaInfoLevel schemaInfoLevel) {
-        var otherInfoLevel = SchemaInfoLevelBuilder.builder();
+        SchemaInfoLevelBuilder otherInfoLevel = SchemaInfoLevelBuilder.builder();
 
         otherInfoLevel.setRetrieveDatabaseInfo(true);
         //otherInfoLevel.setRetrieveJdbcDriverInfo(false);  // would prefer to add this back due to issues w/ Sybase ASE; requires followup w/ SchemaCrawler team
@@ -290,12 +290,15 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
     public DaTable getTableInfo(PhysicalSchema physicalSchema, String tableName, DaSchemaInfoLevel schemaInfoLevel) {
         DaCatalog database = this.getDatabase(physicalSchema, schemaInfoLevel, false, false, tableName, null);
 
-        return switch (database.getTables().size()) {
-            case 0 -> null;
-            case 1 -> database.getTables().iterator().next();
-            default -> throw new IllegalArgumentException("Should have only found 0 or 1 tables here for " + physicalSchema + "," +
+        switch (database.getTables().size()) {
+        case 0:
+            return null;
+        case 1:
+            return database.getTables().iterator().next();
+        default:
+            throw new IllegalArgumentException("Should have only found 0 or 1 tables here for " + physicalSchema + "," +
                     "" + tableName + "; found " + database.getTables().size() + ": " + database.getTables());
-        };
+        }
     }
 
     @Override

@@ -26,11 +26,16 @@ import com.gs.obevo.dbmetadata.api.DaTable;
 import com.gs.obevo.dbmetadata.api.DaUserType;
 import com.gs.obevo.dbmetadata.api.RuleBinding;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.multimap.Multimap;
 import org.eclipse.collections.impl.collection.mutable.CollectionAdapter;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Routine;
+import schemacrawler.schema.Sequence;
+import schemacrawler.schema.Synonym;
+import schemacrawler.schema.Table;
 import schemacrawler.schema.View;
 
 public class DaCatalogImpl implements DaCatalog {
@@ -52,7 +57,12 @@ public class DaCatalogImpl implements DaCatalog {
         this.ruleBindings = ruleBindings;
         this.extraRoutines = extraRoutines;
         this.extraIndexes = extraIndexes;
-        this.extraViewInfoMap = extraViewInfo.groupByUniqueKey(ExtraRerunnableInfo::getName);
+        this.extraViewInfoMap = extraViewInfo.groupByUniqueKey(new Function<ExtraRerunnableInfo, String>() {
+            @Override
+            public String valueOf(ExtraRerunnableInfo extraRerunnableInfo) {
+                return extraRerunnableInfo.getName();
+            }
+        });
         this.routineOverrideValue = routineOverrideValue;
         this.schemaStrategy = schemaStrategy;
         this.packages = packages;
@@ -61,24 +71,38 @@ public class DaCatalogImpl implements DaCatalog {
     @Override
     public ImmutableCollection<DaTable> getTables() {
         return CollectionAdapter.adapt(delegate.getTables())
-                .<DaTable>collect(object -> object instanceof View view
-                        ? new DaViewImpl(view, schemaStrategy, extraViewInfoMap.get(object.getName()))
-                        : new DaTableImpl(object, schemaStrategy, extraIndexes))
+                .collect(new Function<Table, DaTable>() {
+                    @Override
+                    public DaTable valueOf(Table object) {
+                        if (object instanceof View) {
+                            return new DaViewImpl((View) object, schemaStrategy, extraViewInfoMap.get(object.getName()));
+                        } else {
+                            return new DaTableImpl(object, schemaStrategy, extraIndexes);
+                        }
+                    }
+                })
                 .toImmutable();
     }
 
     @Override
     public ImmutableCollection<DaRoutine> getRoutines() {
         return extraRoutines
-                .newWithAll(CollectionAdapter.adapt(delegate.getRoutines())
-                        .<DaRoutine>collect(object -> new DaRoutine6Impl(object, schemaStrategy, routineOverrideValue)));
+                .newWithAll(CollectionAdapter.adapt(delegate.getRoutines()).collect(new Function<Routine, DaRoutine>() {
+                    @Override
+                    public DaRoutine valueOf(Routine object) {
+                        return new DaRoutine6Impl(object, schemaStrategy, routineOverrideValue);
+                    }
+                }));
     }
 
     @Override
     public ImmutableCollection<DaSequence> getSequences() {
-        return CollectionAdapter.adapt(delegate.getSequences())
-                .<DaSequence>collect(object -> new DaSequence6Impl(object, schemaStrategy))
-                .toImmutable();
+        return CollectionAdapter.adapt(delegate.getSequences()).collect(new Function<Sequence, DaSequence>() {
+            @Override
+            public DaSequence valueOf(Sequence object) {
+                return new DaSequence6Impl(object, schemaStrategy);
+            }
+        }).toImmutable();
     }
 
     @Override
@@ -102,8 +126,11 @@ public class DaCatalogImpl implements DaCatalog {
 
     @Override
     public ImmutableCollection<DaSynonym> getSynonyms() {
-        return CollectionAdapter.adapt(delegate.getSynonyms())
-                .<DaSynonym>collect(object -> new DaSynonym6Impl(object, schemaStrategy))
-                .toImmutable();
+        return CollectionAdapter.adapt(delegate.getSynonyms()).collect(new Function<Synonym, DaSynonym>() {
+            @Override
+            public DaSynonym valueOf(Synonym object) {
+                return new DaSynonym6Impl(object, schemaStrategy);
+            }
+        }).toImmutable();
     }
 }

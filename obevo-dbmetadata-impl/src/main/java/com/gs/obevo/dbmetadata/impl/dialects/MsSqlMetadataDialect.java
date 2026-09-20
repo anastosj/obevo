@@ -34,6 +34,7 @@ import com.gs.obevo.dbmetadata.impl.DaRoutinePojoImpl;
 import com.gs.obevo.dbmetadata.impl.RuleBindingImpl;
 import com.gs.obevo.dbmetadata.impl.SchemaByCatalogStrategy;
 import com.gs.obevo.dbmetadata.impl.SchemaStrategy;
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.collections.api.collection.ImmutableCollection;
@@ -88,25 +89,28 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
     public ImmutableCollection<RuleBinding> getRuleBindings(DaSchema schema, Connection conn) {
         String schemaName = schema.getName();
         // return the bindings to columns and bindings to domains
-        String sql = """
-                select tab.name 'object', rul.name 'rule', 'sp_bindrule ' + rul.name + ', ''' + tab.name + '.' + col.name + '''' 'sql'
-                from %1$s..syscolumns col, %1$s..sysobjects rul, %1$s..sysobjects tab
-                    , sys.schemas sch
-                where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0
-                    and tab.uid = sch.schema_id and sch.name = '%2$s'
-                union
-                select obj.name 'object', rul.name 'rule', 'sp_bindrule ' + rul.name + ', ' + obj.name 'sql'
-                from %1$s..systypes obj, %1$s..sysobjects rul
-                    , sys.schemas sch
-                where obj.domain = rul.id and obj.domain <> 0
-                    and obj.uid = sch.schema_id and sch.name = '%2$s'
-                """.formatted(schemaName, schema.getSubschemaName());
+        String sql = "select tab.name 'object', rul.name 'rule', " +
+                "'sp_bindrule ' + rul.name + ', ''' + tab.name + '.' + col.name + '''' 'sql'\n" +
+                "from " + schemaName + "..syscolumns col, " + schemaName + "..sysobjects rul, " + schemaName + "..sysobjects tab\n" +
+                "    , sys.schemas sch\n" +
+                "where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0\n" +
+                "    and tab.uid = sch.schema_id and sch.name = '" + schema.getSubschemaName() + "'\n" +
+                "union\n" +
+                "select obj.name 'object', rul.name 'rule', " +
+                "'sp_bindrule ' + rul.name + ', ' + obj.name 'sql'\n" +
+                "from " + schemaName + "..systypes obj, " + schemaName + "..sysobjects rul\n" +
+                "    , sys.schemas sch\n" +
+                "where obj.domain = rul.id and obj.domain <> 0\n" +
+                "    and obj.uid = sch.schema_id and sch.name = '" + schema.getSubschemaName() + "'\n";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
 
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
             MutableList<RuleBinding> ruleBindings = Lists.mutable.empty();
             while (rs.next()) {
-                var ruleBinding = new RuleBindingImpl();
+                RuleBindingImpl ruleBinding = new RuleBindingImpl();
                 ruleBinding.setObject(rs.getString("object"));
                 ruleBinding.setRule(rs.getString("rule"));
                 ruleBinding.setSql(rs.getString("sql"));
@@ -115,6 +119,9 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
             return ruleBindings.toImmutable();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(ps);
         }
     }
 
@@ -136,7 +143,7 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, query, new MapListHandler())).toImmutable();
 
         return maps.collect(object -> {
-            var routineType = DaRoutineType.valueOf(((String) object.get("ROUTINE_TYPE")).toLowerCase());
+            DaRoutineType routineType = DaRoutineType.valueOf(((String) object.get("ROUTINE_TYPE")).toLowerCase());
             return new DaRoutinePojoImpl(
                     (String) object.get("ROUTINE_NAME"),
                     schema,

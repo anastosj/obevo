@@ -51,9 +51,11 @@ public class DaSchemaImpl implements DaSchema {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaSchemaImpl daSchema6)) {
+        if (!(o instanceof DaSchemaImpl)) {
             return false;
         }
+
+        DaSchemaImpl daSchema6 = (DaSchemaImpl) o;
 
         return schema.equals(daSchema6.schema);
     }
