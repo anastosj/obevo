@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import com.gs.obevo.api.appdata.PhysicalSchema;
@@ -51,11 +54,9 @@ public class DaSchemaImpl implements DaSchema {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaSchemaImpl)) {
+        if (!(o instanceof DaSchemaImpl daSchema6)) {
             return false;
         }
-
-        DaSchemaImpl daSchema6 = (DaSchemaImpl) o;
 
         return schema.equals(daSchema6.schema);
     }

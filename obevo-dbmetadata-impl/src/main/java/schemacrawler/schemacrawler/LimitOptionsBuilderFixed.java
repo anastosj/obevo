@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 
 /**
  * Taken from SchemaCrawler project itself. Can be deleted once we upgrade SchemaCrawer to 16.9.2 and they've
@@ -23,12 +26,12 @@
 package schemacrawler.schemacrawler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -64,7 +67,7 @@ public final class LimitOptionsBuilderFixed implements OptionsBuilder<LimitOptio
     }
 
     private static Collection<String> defaultTableTypes() {
-        return Arrays.asList("BASE TABLE", "TABLE", "VIEW");
+        return List.of("BASE TABLE", "TABLE", "VIEW");
     }
 
     public static LimitOptions newLimitOptions() {
@@ -140,7 +143,7 @@ public final class LimitOptionsBuilderFixed implements OptionsBuilder<LimitOptio
     public LimitOptions toOptions() {
         return new LimitOptions(new EnumMap<>(inclusionRules),
                 tableTypes
-                        .map(types -> new ArrayList<>(types))
+                        .<Collection<String>>map(ArrayList::new)
                         .orElse(null),
                 tableNamePattern,
                 routineTypes

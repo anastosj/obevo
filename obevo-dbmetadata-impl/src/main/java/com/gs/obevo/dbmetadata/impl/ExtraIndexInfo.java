@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -20,18 +23,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.eclipse.collections.api.block.function.Function;
 
 public class ExtraIndexInfo {
-    public static final Function<ExtraIndexInfo, String> TO_TABLE_NAME = new Function<ExtraIndexInfo, String>() {
-        @Override
-        public String valueOf(ExtraIndexInfo extraIndexInfo) {
-            return extraIndexInfo.getTableName();
-        }
-    };
-    public static final Function<ExtraIndexInfo, String> TO_INDEX_NAME = new Function<ExtraIndexInfo, String>() {
-        @Override
-        public String valueOf(ExtraIndexInfo extraIndexInfo) {
-            return extraIndexInfo.getIndexName();
-        }
-    };
+    public static final Function<ExtraIndexInfo, String> TO_TABLE_NAME = ExtraIndexInfo::getTableName;
+    public static final Function<ExtraIndexInfo, String> TO_INDEX_NAME = ExtraIndexInfo::getIndexName;
     private final String tableName;
     private final String indexName;
     private final boolean constraint;

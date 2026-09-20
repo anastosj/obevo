@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -43,23 +46,13 @@ public class ExtraRerunnableInfo {
         this.order1 = order1;
     }
 
-    public static final Function<ExtraRerunnableInfo, String> TO_NAME = new Function<ExtraRerunnableInfo, String>() {
-        @Override
-        public String valueOf(ExtraRerunnableInfo object) {
-            return object.getName();
-        }
-    };
+    public static final Function<ExtraRerunnableInfo, String> TO_NAME = ExtraRerunnableInfo::getName;
 
     public String getName() {
         return name;
     }
 
-    public static final Function<ExtraRerunnableInfo, String> TO_SPECIFIC_NAME = new Function<ExtraRerunnableInfo, String>() {
-        @Override
-        public String valueOf(ExtraRerunnableInfo object) {
-            return object.getSpecificName();
-        }
-    };
+    public static final Function<ExtraRerunnableInfo, String> TO_SPECIFIC_NAME = ExtraRerunnableInfo::getSpecificName;
 
     public String getSpecificName() {
         return specificName;
@@ -69,23 +62,13 @@ public class ExtraRerunnableInfo {
         return definition;
     }
 
-    public static final Function<ExtraRerunnableInfo, Integer> TO_ORDER2 = new Function<ExtraRerunnableInfo, Integer>() {
-        @Override
-        public Integer valueOf(ExtraRerunnableInfo object) {
-            return object.getOrder2();
-        }
-    };
+    public static final Function<ExtraRerunnableInfo, Integer> TO_ORDER2 = ExtraRerunnableInfo::getOrder2;
 
     private int getOrder2() {
         return order2;
     }
 
-    public static final Function<ExtraRerunnableInfo, Integer> TO_ORDER1 = new Function<ExtraRerunnableInfo, Integer>() {
-        @Override
-        public Integer valueOf(ExtraRerunnableInfo object) {
-            return object.getOrder1();
-        }
-    };
+    public static final Function<ExtraRerunnableInfo, Integer> TO_ORDER1 = ExtraRerunnableInfo::getOrder1;
 
     private int getOrder1() {
         return order1;

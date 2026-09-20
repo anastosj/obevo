@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl.dialects;
 
 import java.io.IOException;
@@ -60,8 +63,10 @@ public class Db2MetadataDialect extends AbstractMetadataDialect {
     @Override
     public ImmutableCollection<DaRoutine> searchExtraRoutines(final DaSchema schema, String procedureName, Connection conn) throws SQLException {
         String procedureClause = procedureName == null ? "" : " AND R.ROUTINENAME = '" + procedureName + "'";
-        final String sql = "SELECT ROUTINENAME, SPECIFICNAME, TEXT FROM SYSCAT.ROUTINES R WHERE R.ROUTINETYPE = 'F'\n" +
-                "AND R.ROUTINESCHEMA = '" + schema.getName() + "'\n" + procedureClause;
+        final String sql = """
+                SELECT ROUTINENAME, SPECIFICNAME, TEXT FROM SYSCAT.ROUTINES R WHERE R.ROUTINETYPE = 'F'
+                AND R.ROUTINESCHEMA = '%s'
+                %s""".formatted(schema.getName(), procedureClause);
         LOG.debug("Executing function metadata query SQL: {}", sql);
 
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn,
@@ -72,7 +77,7 @@ public class Db2MetadataDialect extends AbstractMetadataDialect {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Results:");
             for (Map<String, Object> map : maps) {
-                LOG.debug("ROW: {}", map.toString());
+                LOG.debug("ROW: {}", map);
             }
         }
 
@@ -102,60 +107,63 @@ public class Db2MetadataDialect extends AbstractMetadataDialect {
     @Override
     public MutableMap<InformationSchemaKey, String> getInfoSchemaSqlOverrides(PhysicalSchema physicalSchema) {
         // the SQL in SchemaCrawler does not define the VALID column, so we add it here
-        String viewSql = "SELECT " +
-                "  NULLIF(1, 1) " +
-                "    AS TABLE_CATALOG, " +
-                "  STRIP(SYSCAT.VIEWS.VIEWSCHEMA) " +
-                "    AS TABLE_SCHEMA, " +
-                "  STRIP(SYSCAT.VIEWS.VIEWNAME) " +
-                "    AS TABLE_NAME, " +
-                "  SYSCAT.VIEWS.TEXT " +
-                "    AS VIEW_DEFINITION, " +
-                "  CASE WHEN STRIP(SYSCAT.VIEWS.VIEWCHECK) = 'N' THEN 'NONE' ELSE 'CASCADED' END " +
-                "    AS CHECK_OPTION, " +
-                "  CASE WHEN STRIP(SYSCAT.VIEWS.READONLY) = 'Y' THEN 'NO' ELSE 'YES' END " +
-                "    AS IS_UPDATABLE " +
-                ", " +
-                "  VALID   " +
-                "FROM " +
-                "  SYSCAT.VIEWS " +
-                "WHERE VIEWSCHEMA = '" + physicalSchema.getPhysicalName() + "' " +
-                "ORDER BY " +
-                "  SYSCAT.VIEWS.VIEWSCHEMA, " +
-                "  SYSCAT.VIEWS.VIEWNAME, " +
-                "  SYSCAT.VIEWS.SEQNO " +
-                "WITH UR   ";
+        String viewSql = """
+                SELECT
+                  NULLIF(1, 1)
+                    AS TABLE_CATALOG,
+                  STRIP(SYSCAT.VIEWS.VIEWSCHEMA)
+                    AS TABLE_SCHEMA,
+                  STRIP(SYSCAT.VIEWS.VIEWNAME)
+                    AS TABLE_NAME,
+                  SYSCAT.VIEWS.TEXT
+                    AS VIEW_DEFINITION,
+                  CASE WHEN STRIP(SYSCAT.VIEWS.VIEWCHECK) = 'N' THEN 'NONE' ELSE 'CASCADED' END
+                    AS CHECK_OPTION,
+                  CASE WHEN STRIP(SYSCAT.VIEWS.READONLY) = 'Y' THEN 'NO' ELSE 'YES' END
+                    AS IS_UPDATABLE
+                ,
+                  VALID
+                FROM
+                  SYSCAT.VIEWS
+                WHERE VIEWSCHEMA = '%s'
+                ORDER BY
+                  SYSCAT.VIEWS.VIEWSCHEMA,
+                  SYSCAT.VIEWS.VIEWNAME,
+                  SYSCAT.VIEWS.SEQNO
+                WITH UR
+                """.formatted(physicalSchema.getPhysicalName());
 
         // SEQTYPE <> 'I' is for identity columns; we don't want that when pulling user defined sequences
-        String sequencesSql = "SELECT\n" +
-                "  NULLIF(1, 1)\n" +
-                "    AS SEQUENCE_CATALOG,\n" +
-                "  STRIP(SYSCAT.SEQUENCES.SEQSCHEMA)\n" +
-                "    AS SEQUENCE_SCHEMA,\n" +
-                "  STRIP(SYSCAT.SEQUENCES.SEQNAME)\n" +
-                "    AS SEQUENCE_NAME,\n" +
-                "  INCREMENT,\n" +
-                "  MINVALUE AS MINIMUM_VALUE,\n" +
-                "  MAXVALUE AS MAXIMUM_VALUE,\n" +
-                "  CASE WHEN CYCLE = 'Y' THEN 'YES' ELSE 'NO' END AS CYCLE_OPTION,\n" +
-                "  SEQID,\n" +
-                "  SEQTYPE,\n" +
-                "  START,\n" +
-                "  NEXTCACHEFIRSTVALUE,\n" +
-                "  CACHE,\n" +
-                "  ORDER,\n" +
-                "  CREATE_TIME,\n" +
-                "  ALTER_TIME,\n" +
-                "  REMARKS\n" +
-                "FROM\n" +
-                "  SYSCAT.SEQUENCES\n" +
-                "WHERE SEQSCHEMA = '" + physicalSchema.getPhysicalName() + "' AND SEQTYPE <> 'I'\n" +
-
-                //"  SYSCAT.SEQUENCES.ORIGIN = 'U'\n" +
-                "ORDER BY\n" +
-                "  SYSCAT.SEQUENCES.SEQSCHEMA,\n" +
-                "  SYSCAT.SEQUENCES.SEQNAME\n" +
-                "WITH UR\n";
+        // (SYSCAT.SEQUENCES.ORIGIN = 'U' would be an alternative filter)
+        String sequencesSql = """
+                SELECT
+                  NULLIF(1, 1)
+                    AS SEQUENCE_CATALOG,
+                  STRIP(SYSCAT.SEQUENCES.SEQSCHEMA)
+                    AS SEQUENCE_SCHEMA,
+                  STRIP(SYSCAT.SEQUENCES.SEQNAME)
+                    AS SEQUENCE_NAME,
+                  INCREMENT,
+                  MINVALUE AS MINIMUM_VALUE,
+                  MAXVALUE AS MAXIMUM_VALUE,
+                  CASE WHEN CYCLE = 'Y' THEN 'YES' ELSE 'NO' END AS CYCLE_OPTION,
+                  SEQID,
+                  SEQTYPE,
+                  START,
+                  NEXTCACHEFIRSTVALUE,
+                  CACHE,
+                  ORDER,
+                  CREATE_TIME,
+                  ALTER_TIME,
+                  REMARKS
+                FROM
+                  SYSCAT.SEQUENCES
+                WHERE SEQSCHEMA = '%s' AND SEQTYPE <> 'I'
+                ORDER BY
+                  SYSCAT.SEQUENCES.SEQSCHEMA,
+                  SYSCAT.SEQUENCES.SEQNAME
+                WITH UR
+                """.formatted(physicalSchema.getPhysicalName());
 
         return Maps.mutable.of(
                 InformationSchemaKey.VIEWS, viewSql,
@@ -168,14 +176,11 @@ public class Db2MetadataDialect extends AbstractMetadataDialect {
             return null;
         }
 
-        try {
-            InputStream in = clob.getAsciiStream();
+        try (InputStream in = clob.getAsciiStream()) {
             StringWriter w = new StringWriter();
             IOUtils.copy(in, w);
             return w.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

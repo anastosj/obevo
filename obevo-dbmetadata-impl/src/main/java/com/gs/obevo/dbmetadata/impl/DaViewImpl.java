@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import com.gs.obevo.dbmetadata.api.DaColumn;
@@ -98,11 +101,9 @@ public class DaViewImpl implements DaView {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaViewImpl)) {
+        if (!(o instanceof DaViewImpl daView6)) {
             return false;
         }
-
-        DaViewImpl daView6 = (DaViewImpl) o;
 
         return view.equals(daView6.view);
     }

@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl.dialects;
 
 import java.sql.Connection;
@@ -28,7 +31,6 @@ import com.gs.obevo.dbmetadata.api.DaUserType;
 import com.gs.obevo.dbmetadata.api.DaUserTypeImpl;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MutableMap;
@@ -69,21 +71,23 @@ public class PostgresqlMetadataDialect extends AbstractMetadataDialect {
      * Protected visibility as subclasses may need to override.
      */
     protected String getSequenceSql(PhysicalSchema physicalSchema) {
-        return "SELECT\n" +
-                "  NULL AS SEQUENCE_CATALOG,\n" +
-                "  SEQUENCE_SCHEMA,\n" +
-                "  SEQUENCE_NAME,\n" +
-                "  INCREMENT,\n" +
-                "  MINIMUM_VALUE,\n" +
-                "  MAXIMUM_VALUE,\n" +
-                "  CYCLE_OPTION\n" +
-                "FROM\n" +
-                "  INFORMATION_SCHEMA.SEQUENCES\n" +
-                "WHERE SEQUENCE_SCHEMA = '" + physicalSchema.getPhysicalName() + "'\n" +
-                "ORDER BY\n" +
-                "  SEQUENCE_CATALOG,\n" +
-                "  SEQUENCE_SCHEMA,\n" +
-                "  SEQUENCE_NAME\n";
+        return """
+                SELECT
+                  NULL AS SEQUENCE_CATALOG,
+                  SEQUENCE_SCHEMA,
+                  SEQUENCE_NAME,
+                  INCREMENT,
+                  MINIMUM_VALUE,
+                  MAXIMUM_VALUE,
+                  CYCLE_OPTION
+                FROM
+                  INFORMATION_SCHEMA.SEQUENCES
+                WHERE SEQUENCE_SCHEMA = '%s'
+                ORDER BY
+                  SEQUENCE_CATALOG,
+                  SEQUENCE_SCHEMA,
+                  SEQUENCE_NAME
+                """.formatted(physicalSchema.getPhysicalName());
     }
 
     @Override
@@ -110,34 +114,25 @@ public class PostgresqlMetadataDialect extends AbstractMetadataDialect {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Results:");
             for (Map<String, Object> map : maps) {
-                LOG.debug("ROW: {}", map.toString());
+                LOG.debug("ROW: {}", map);
             }
         }
 
-        return maps.collect(new Function<Map<String, Object>, DaExtension>() {
-            @Override
-            public DaExtension valueOf(Map<String, Object> map) {
-                return new DaExtensionImpl((String) map.get("EXTNAME"));
-            }
-        }).toSet().toImmutable();
+        return maps.<DaExtension>collect(map -> new DaExtensionImpl((String) map.get("EXTNAME"))).toSet().toImmutable();
     }
 
     @Override
     public ImmutableCollection<DaUserType> searchUserTypes(final DaSchema schema, Connection conn) {
-        String sql = "SELECT t.typname \n" +
-                "FROM        pg_type t \n" +
-                "LEFT JOIN   pg_catalog.pg_namespace n ON n.oid = t.typnamespace \n" +
-                "WHERE       (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) \n" +
-                "AND     NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid)\n" +
-                "AND     n.nspname IN ('" + schema.getName() + "')";
+        String sql = """
+                SELECT t.typname
+                FROM        pg_type t
+                LEFT JOIN   pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+                WHERE       (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid))
+                AND     NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid)
+                AND     n.nspname IN ('%s')""".formatted(schema.getName());
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, sql, new MapListHandler())).toImmutable();
 
-        return maps.collect(new Function<Map<String, Object>, DaUserType>() {
-            @Override
-            public DaUserType valueOf(Map<String, Object> map) {
-                return new DaUserTypeImpl((String) map.get("typname"), schema);
-            }
-        });
+        return maps.collect(map -> new DaUserTypeImpl((String) map.get("typname"), schema));
     }
 
     @Override

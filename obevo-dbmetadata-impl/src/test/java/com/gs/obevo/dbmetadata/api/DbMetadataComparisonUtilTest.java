@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.api;
 
 import com.gs.obevo.api.appdata.PhysicalSchema;
@@ -58,29 +61,33 @@ public class DbMetadataComparisonUtilTest {
     @Test
     public void testTableStaySame() throws Exception {
         this.jdbc.update("DROP TABLE IF EXISTS " + schemaStr + "." + table);
-        this.jdbc.update("CREATE TABLE " + schemaStr + "." + table + " (\n" +
-                "AID    INT NOT NULL,\n" +
-                "BID    INT NOT NULL,\n" +
-                "STRINGFIELD VARCHAR(30)\tNULL,\n" +
-                "TIMESTAMPFIELD TIMESTAMP\tNULL,\n" +
-                "CID    INT NULL,\n" +
-                "UPDATETIMEFIELD TIMESTAMP NOT NULL, \n" +
-                "PRIMARY KEY (AID)\n" +
-                ")\n");
+        this.jdbc.update("""
+                CREATE TABLE %s.%s (
+                AID    INT NOT NULL,
+                BID    INT NOT NULL,
+                STRINGFIELD VARCHAR(30)\tNULL,
+                TIMESTAMPFIELD TIMESTAMP\tNULL,
+                CID    INT NULL,
+                UPDATETIMEFIELD TIMESTAMP NOT NULL,
+                PRIMARY KEY (AID)
+                )
+                """.formatted(schemaStr, table));
 
         DaTable tableLeft = this.metadataManager.getTableInfo(schema, DbMetadataComparisonUtilTest.table,
                 new DaSchemaInfoLevel().setMaximum());
 
         this.jdbc.update("DROP TABLE IF EXISTS " + schemaStr + "." + table);
-        this.jdbc.update("CREATE TABLE " + schemaStr + "." + table + " (\n" +
-                "AID    INT NOT NULL,\n" +
-                "BID    INT NOT NULL,\n" +
-                "STRINGFIELD VARCHAR(30)\tNULL,\n" +
-                "TIMESTAMPFIELD TIMESTAMP\tNULL,\n" +
-                "CID    INT NULL,\n" +
-                "UPDATETIMEFIELD TIMESTAMP NOT NULL, \n" +
-                "PRIMARY KEY (AID)\n" +
-                ")\n");
+        this.jdbc.update("""
+                CREATE TABLE %s.%s (
+                AID    INT NOT NULL,
+                BID    INT NOT NULL,
+                STRINGFIELD VARCHAR(30)\tNULL,
+                TIMESTAMPFIELD TIMESTAMP\tNULL,
+                CID    INT NULL,
+                UPDATETIMEFIELD TIMESTAMP NOT NULL,
+                PRIMARY KEY (AID)
+                )
+                """.formatted(schemaStr, table));
 
         DaTable tableRight = this.metadataManager.getTableInfo(schema, DbMetadataComparisonUtilTest.table,
                 new DaSchemaInfoLevel().setMaximum());
@@ -90,29 +97,33 @@ public class DbMetadataComparisonUtilTest {
     @Test
     public void testTableChanges() throws Exception {
         this.jdbc.update("DROP TABLE IF EXISTS " + schemaStr + "." + table);
-        this.jdbc.update("CREATE TABLE " + schemaStr + "." + table + " (\n" +
-                "AID    INT NOT NULL,\n" +
-                "B_TYPE_CHANGE    INT NOT NULL,\n" +
-                "STRING_LENCHANGE VARCHAR(30)\tNULL,\n" +
-                "TIMESTAMPFIELD TIMESTAMP\tNULL,\n" +
-                "C_NULL_CHANGE    INT NULL,\n" +
-                "UPDATETIMEFIELD TIMESTAMP NOT NULL, \n" +
-                "PRIMARY KEY (AID)\n" +
-                ")\n");
+        this.jdbc.update("""
+                CREATE TABLE %s.%s (
+                AID    INT NOT NULL,
+                B_TYPE_CHANGE    INT NOT NULL,
+                STRING_LENCHANGE VARCHAR(30)\tNULL,
+                TIMESTAMPFIELD TIMESTAMP\tNULL,
+                C_NULL_CHANGE    INT NULL,
+                UPDATETIMEFIELD TIMESTAMP NOT NULL,
+                PRIMARY KEY (AID)
+                )
+                """.formatted(schemaStr, table));
 
         DaTable tableLeft = this.metadataManager.getTableInfo(schema, DbMetadataComparisonUtilTest.table,
                 new DaSchemaInfoLevel().setMaximum());
 
         this.jdbc.update("DROP TABLE IF EXISTS " + schemaStr + "." + table);
-        this.jdbc.update("CREATE TABLE " + schemaStr + "." + table + " (\n" +
-                "AID_NAMECHANGE    INT NOT NULL,\n" +
-                "B_TYPE_CHANGE    BIGINT NOT NULL,\n" +
-                "STRING_LENCHANGE VARCHAR(60)\tNULL,\n" +
-                "TIMESTAMPFIELD TIMESTAMP\tNULL,\n" +
-                "C_NULL_CHANGE    INT NOT NULL,\n" +
-                "UPDATETIMEFIELD TIMESTAMP NOT NULL, \n" +
-                "PRIMARY KEY (AID_NAMECHANGE)\n" +
-                ")\n");
+        this.jdbc.update("""
+                CREATE TABLE %s.%s (
+                AID_NAMECHANGE    INT NOT NULL,
+                B_TYPE_CHANGE    BIGINT NOT NULL,
+                STRING_LENCHANGE VARCHAR(60)\tNULL,
+                TIMESTAMPFIELD TIMESTAMP\tNULL,
+                C_NULL_CHANGE    INT NOT NULL,
+                UPDATETIMEFIELD TIMESTAMP NOT NULL,
+                PRIMARY KEY (AID_NAMECHANGE)
+                )
+                """.formatted(schemaStr, table));
 
         DaTable tableRight = this.metadataManager.getTableInfo(schema, DbMetadataComparisonUtilTest.table,
                 new DaSchemaInfoLevel().setMaximum());

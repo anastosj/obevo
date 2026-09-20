@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl.dialects;
 
 import java.io.IOException;
@@ -26,7 +29,6 @@ import com.gs.obevo.dbmetadata.api.DaUserType;
 import com.gs.obevo.dbmetadata.api.DaUserTypeImpl;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -41,19 +43,15 @@ public class HsqlMetadataDialect extends AbstractMetadataDialect {
 
     @Override
     public ImmutableCollection<DaUserType> searchUserTypes(final DaSchema schema, Connection conn) throws SQLException {
-        ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn,
-                "select dom.DOMAIN_NAME AS USER_TYPE_NAME\n" +
-                        "from INFORMATION_SCHEMA.DOMAINS dom\n" +
-                        "WHERE dom.DOMAIN_SCHEMA = ucase('" + schema.getName() + "')\n",
-                new MapListHandler()
-        )).toImmutable();
+        String sql = """
+                select dom.DOMAIN_NAME AS USER_TYPE_NAME
+                from INFORMATION_SCHEMA.DOMAINS dom
+                WHERE dom.DOMAIN_SCHEMA = ucase('%s')
+                """.formatted(schema.getName());
 
-        return maps.collect(new Function<Map<String, Object>, DaUserType>() {
-            @Override
-            public DaUserType valueOf(Map<String, Object> map) {
-                return new DaUserTypeImpl((String) map.get("USER_TYPE_NAME"), schema);
-            }
-        });
+        ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, sql, new MapListHandler())).toImmutable();
+
+        return maps.collect(map -> new DaUserTypeImpl((String) map.get("USER_TYPE_NAME"), schema));
     }
 
     @Override

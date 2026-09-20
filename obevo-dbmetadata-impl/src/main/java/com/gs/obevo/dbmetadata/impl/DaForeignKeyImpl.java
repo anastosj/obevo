@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import com.gs.obevo.dbmetadata.api.DaColumnReference;
@@ -20,11 +23,9 @@ import com.gs.obevo.dbmetadata.api.DaForeignKey;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.list.mutable.ListAdapter;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.ForeignKeyColumnReference;
 
 public class DaForeignKeyImpl implements DaForeignKey {
     private final ForeignKey fk;
@@ -43,12 +44,7 @@ public class DaForeignKeyImpl implements DaForeignKey {
     @Override
     public ImmutableList<DaColumnReference> getColumnReferences() {
         return ListAdapter.adapt(fk.getColumnReferences())
-                .collect(new Function<ForeignKeyColumnReference, DaColumnReference>() {
-                    @Override
-                    public DaColumnReference valueOf(ForeignKeyColumnReference fk) {
-                        return new DaColumnReferenceImpl(fk, schemaStrategy);
-                    }
-                })
+                .<DaColumnReference>collect(columnReference -> new DaColumnReferenceImpl(columnReference, schemaStrategy))
                 .toImmutable();
     }
 
@@ -57,11 +53,9 @@ public class DaForeignKeyImpl implements DaForeignKey {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaForeignKeyImpl)) {
+        if (!(o instanceof DaForeignKeyImpl that)) {
             return false;
         }
-
-        DaForeignKeyImpl that = (DaForeignKeyImpl) o;
 
         return fk.equals(that.fk);
     }

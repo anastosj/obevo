@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import java.io.IOException;
@@ -290,15 +293,12 @@ public class DbMetadataManagerImpl implements DbMetadataManager {
     public DaTable getTableInfo(PhysicalSchema physicalSchema, String tableName, DaSchemaInfoLevel schemaInfoLevel) {
         DaCatalog database = this.getDatabase(physicalSchema, schemaInfoLevel, false, false, tableName, null);
 
-        switch (database.getTables().size()) {
-        case 0:
-            return null;
-        case 1:
-            return database.getTables().iterator().next();
-        default:
-            throw new IllegalArgumentException("Should have only found 0 or 1 tables here for " + physicalSchema + "," +
+        return switch (database.getTables().size()) {
+            case 0 -> null;
+            case 1 -> database.getTables().iterator().next();
+            default -> throw new IllegalArgumentException("Should have only found 0 or 1 tables here for " + physicalSchema + "," +
                     "" + tableName + "; found " + database.getTables().size() + ": " + database.getTables());
-        }
+        };
     }
 
     @Override

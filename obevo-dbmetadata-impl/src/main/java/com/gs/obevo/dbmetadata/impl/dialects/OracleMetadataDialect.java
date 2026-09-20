@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl.dialects;
 
 import java.io.IOException;
@@ -30,7 +33,6 @@ import com.gs.obevo.dbmetadata.api.DaUserTypeImpl;
 import com.gs.obevo.dbmetadata.impl.DaPackagePojoImpl;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -64,10 +66,11 @@ public class OracleMetadataDialect extends AbstractMetadataDialect {
     @Override
     public ImmutableCollection<DaPackage> searchPackages(final DaSchema schema, String procedureName, Connection conn) throws SQLException {
         String procedureClause = procedureName == null ? "" : " AND OBJECT_NAME = '" + procedureName + "'";
-        final String sql = "SELECT OBJECT_NAME, OBJECT_TYPE FROM ALL_OBJECTS\n" +
-                "WHERE OBJECT_TYPE IN ('PACKAGE')\n" +
-                "AND OWNER = '" + schema.getName() + "'\n" +
-                procedureClause;
+        final String sql = """
+                SELECT OBJECT_NAME, OBJECT_TYPE FROM ALL_OBJECTS
+                WHERE OBJECT_TYPE IN ('PACKAGE')
+                AND OWNER = '%s'
+                %s""".formatted(schema.getName(), procedureClause);
         LOG.debug("Executing package metadata query SQL: {}", sql);
 
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn,
@@ -78,16 +81,11 @@ public class OracleMetadataDialect extends AbstractMetadataDialect {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Results:");
             for (Map<String, Object> map : maps) {
-                LOG.debug("ROW: {}", map.toString());
+                LOG.debug("ROW: {}", map);
             }
         }
 
-        return maps.collect(new Function<Map<String, Object>, DaPackage>() {
-            @Override
-            public DaPackage valueOf(Map<String, Object> map) {
-                return new DaPackagePojoImpl((String) map.get("OBJECT_NAME"), schema);
-            }
-        });
+        return maps.collect(map -> new DaPackagePojoImpl((String) map.get("OBJECT_NAME"), schema));
     }
 
     @Override
@@ -100,31 +98,22 @@ public class OracleMetadataDialect extends AbstractMetadataDialect {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Results:");
             for (Map<String, Object> map : maps) {
-                LOG.debug("ROW: {}", map.toString());
+                LOG.debug("ROW: {}", map);
             }
         }
 
-        return maps.collect(new Function<Map<String, Object>, DaDirectory>() {
-            @Override
-            public DaDirectory valueOf(Map<String, Object> map) {
-                return new DaDirectoryImpl((String) map.get("DIRECTORY_NAME"), (String) map.get("DIRECTORY_PATH"));
-            }
-        }).toSet().toImmutable();
+        return maps.<DaDirectory>collect(map -> new DaDirectoryImpl((String) map.get("DIRECTORY_NAME"), (String) map.get("DIRECTORY_PATH"))).toSet().toImmutable();
     }
 
     @Override
     public ImmutableCollection<DaUserType> searchUserTypes(final DaSchema schema, Connection conn) {
-        String sql = "SELECT TYPE_NAME " +
-                "FROM ALL_TYPES " +
-                "WHERE OWNER = '" + schema.getName() + "'";
+        String sql = """
+                SELECT TYPE_NAME
+                FROM ALL_TYPES
+                WHERE OWNER = '%s'""".formatted(schema.getName());
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, sql, new MapListHandler())).toImmutable();
 
-        return maps.collect(new Function<Map<String, Object>, DaUserType>() {
-            @Override
-            public DaUserType valueOf(Map<String, Object> map) {
-                return new DaUserTypeImpl((String) map.get("TYPE_NAME"), schema);
-            }
-        });
+        return maps.collect(map -> new DaUserTypeImpl((String) map.get("TYPE_NAME"), schema));
     }
 
     @Override

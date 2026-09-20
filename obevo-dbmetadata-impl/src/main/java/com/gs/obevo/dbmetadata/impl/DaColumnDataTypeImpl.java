@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import com.gs.obevo.dbmetadata.api.DaColumnDataType;
@@ -43,11 +46,9 @@ public class DaColumnDataTypeImpl implements DaColumnDataType {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaColumnDataTypeImpl)) {
+        if (!(o instanceof DaColumnDataTypeImpl that)) {
             return false;
         }
-
-        DaColumnDataTypeImpl that = (DaColumnDataTypeImpl) o;
 
         return columnDataType.equals(that.columnDataType);
     }

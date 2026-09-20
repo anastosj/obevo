@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl;
 
 import com.gs.obevo.dbmetadata.api.DaColumn;
@@ -77,11 +80,9 @@ public class DaColumnImpl implements DaColumn {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaColumnImpl)) {
+        if (!(o instanceof DaColumnImpl daColumn6)) {
             return false;
         }
-
-        DaColumnImpl daColumn6 = (DaColumnImpl) o;
 
         return column.equals(daColumn6.column);
     }

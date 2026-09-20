@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.dbmetadata.impl.dialects;
 
 import java.sql.Connection;
@@ -34,7 +37,6 @@ import com.gs.obevo.dbmetadata.impl.DaRoutinePojoImpl;
 import com.gs.obevo.dbmetadata.impl.RuleBindingImpl;
 import com.gs.obevo.dbmetadata.impl.SchemaByCatalogStrategy;
 import com.gs.obevo.dbmetadata.impl.SchemaStrategy;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.collections.api.collection.ImmutableCollection;
@@ -89,25 +91,22 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
     public ImmutableCollection<RuleBinding> getRuleBindings(DaSchema schema, Connection conn) {
         String schemaName = schema.getName();
         // return the bindings to columns and bindings to domains
-        String sql = "select tab.name 'object', rul.name 'rule', " +
-                "'sp_bindrule ' + rul.name + ', ''' + tab.name + '.' + col.name + '''' 'sql'\n" +
-                "from " + schemaName + "..syscolumns col, " + schemaName + "..sysobjects rul, " + schemaName + "..sysobjects tab\n" +
-                "    , sys.schemas sch\n" +
-                "where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0\n" +
-                "    and tab.uid = sch.schema_id and sch.name = '" + schema.getSubschemaName() + "'\n" +
-                "union\n" +
-                "select obj.name 'object', rul.name 'rule', " +
-                "'sp_bindrule ' + rul.name + ', ' + obj.name 'sql'\n" +
-                "from " + schemaName + "..systypes obj, " + schemaName + "..sysobjects rul\n" +
-                "    , sys.schemas sch\n" +
-                "where obj.domain = rul.id and obj.domain <> 0\n" +
-                "    and obj.uid = sch.schema_id and sch.name = '" + schema.getSubschemaName() + "'\n";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
+        String sql = """
+                select tab.name 'object', rul.name 'rule', 'sp_bindrule ' + rul.name + ', ''' + tab.name + '.' + col.name + '''' 'sql'
+                from %1$s..syscolumns col, %1$s..sysobjects rul, %1$s..sysobjects tab
+                    , sys.schemas sch
+                where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0
+                    and tab.uid = sch.schema_id and sch.name = '%2$s'
+                union
+                select obj.name 'object', rul.name 'rule', 'sp_bindrule ' + rul.name + ', ' + obj.name 'sql'
+                from %1$s..systypes obj, %1$s..sysobjects rul
+                    , sys.schemas sch
+                where obj.domain = rul.id and obj.domain <> 0
+                    and obj.uid = sch.schema_id and sch.name = '%2$s'
+                """.formatted(schemaName, schema.getSubschemaName());
 
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             MutableList<RuleBinding> ruleBindings = Lists.mutable.empty();
             while (rs.next()) {
                 RuleBindingImpl ruleBinding = new RuleBindingImpl();
@@ -119,9 +118,6 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
             return ruleBindings.toImmutable();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            DbUtils.closeQuietly(rs);
-            DbUtils.closeQuietly(ps);
         }
     }
 
@@ -129,17 +125,18 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
     public ImmutableCollection<DaRoutine> searchExtraRoutines(final DaSchema schema, String procedureName, Connection conn) throws SQLException {
         String nameClause = procedureName != null ? " and ROUTINE_NAME = '" + procedureName + "'\n" : " ";
 
-        String query = "SELECT" +
-                "    ROUTINE_CATALOG," +
-                "    ROUTINE_SCHEMA," +
-                "    ROUTINE_NAME," +
-                "    SPECIFIC_NAME," +
-                "    ROUTINE_TYPE," +
-                "    OBJECT_DEFINITION(OBJECT_ID(ROUTINE_CATALOG + '.' + ROUTINE_SCHEMA + '.' + ROUTINE_NAME)) AS ROUTINE_DEFINITION" +
-                " FROM INFORMATION_SCHEMA.ROUTINES" +
-                " WHERE ROUTINE_CATALOG = '" + schema.getName() + "'" +
-                " AND ROUTINE_SCHEMA = '" + schema.getSubschemaName() + "'" +
-                nameClause;
+        String query = """
+                SELECT
+                    ROUTINE_CATALOG,
+                    ROUTINE_SCHEMA,
+                    ROUTINE_NAME,
+                    SPECIFIC_NAME,
+                    ROUTINE_TYPE,
+                    OBJECT_DEFINITION(OBJECT_ID(ROUTINE_CATALOG + '.' + ROUTINE_SCHEMA + '.' + ROUTINE_NAME)) AS ROUTINE_DEFINITION
+                 FROM INFORMATION_SCHEMA.ROUTINES
+                 WHERE ROUTINE_CATALOG = '%1$s'
+                 AND ROUTINE_SCHEMA = '%2$s'
+                %3$s""".formatted(schema.getName(), schema.getSubschemaName(), nameClause);
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, query, new MapListHandler())).toImmutable();
 
         return maps.collect(object -> {
@@ -157,16 +154,17 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
     @Override
     public ImmutableCollection<DaRule> searchRules(final DaSchema schema, Connection conn) throws SQLException {
         // Do not use ANSI JOIN as it does not work in Sybase 11.x - the SQL below works across all versions
-        String sql = "SELECT rul.name as RULE_NAME\n" +
-                "FROM " + schema.getName() + "..sysobjects rul\n" +
-                "    , sys.schemas sch\n" +
-                "WHERE rul.type = 'R'\n" +
-                "    and rul.uid = sch.schema_id and sch.name = '" + schema.getSubschemaName() + "' " +
-                "and not exists (\n" +
-                "\t-- Ensure that the entry is not attached to a table; otherwise, it is a regular table constraint, and will already be dropped when the table is dropped\n" +
-                "\tselect 1 from " + schema.getName() + "..sysconstraints c\n" +
-                "\twhere c.constid = rul.id\n" +
-                ")\n";
+        String sql = """
+                SELECT rul.name as RULE_NAME
+                FROM %1$s..sysobjects rul
+                    , sys.schemas sch
+                WHERE rul.type = 'R'
+                    and rul.uid = sch.schema_id and sch.name = '%2$s' and not exists (
+                \t-- Ensure that the entry is not attached to a table; otherwise, it is a regular table constraint, and will already be dropped when the table is dropped
+                \tselect 1 from %1$s..sysconstraints c
+                \twhere c.constid = rul.id
+                )
+                """.formatted(schema.getName(), schema.getSubschemaName());
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, sql, new MapListHandler())).toImmutable();
 
         return maps.collect(map -> new DaRuleImpl((String) map.get("RULE_NAME"), schema));
@@ -174,10 +172,11 @@ public class MsSqlMetadataDialect extends AbstractMetadataDialect {
 
     @Override
     public ImmutableCollection<DaUserType> searchUserTypes(final DaSchema schema, Connection conn) throws SQLException {
-        String sql = "SELECT DOMAIN_NAME as USER_TYPE_NAME " +
-                "FROM INFORMATION_SCHEMA.DOMAINS " +
-                "WHERE DOMAIN_CATALOG = '" + schema.getName() + "' " +
-                "AND DOMAIN_SCHEMA = '" + schema.getSubschemaName() + "'";
+        String sql = """
+                SELECT DOMAIN_NAME as USER_TYPE_NAME
+                FROM INFORMATION_SCHEMA.DOMAINS
+                WHERE DOMAIN_CATALOG = '%1$s'
+                AND DOMAIN_SCHEMA = '%2$s'""".formatted(schema.getName(), schema.getSubschemaName());
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, sql, new MapListHandler())).toImmutable();
 
         return maps.collect(map -> new DaUserTypeImpl((String) map.get("USER_TYPE_NAME"), schema));
