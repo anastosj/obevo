@@ -13,9 +13,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.gs.obevo.db.impl.platforms.mssql;
 
-import java.util.regex.Matcher;
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+package com.gs.obevo.db.impl.platforms.mssql;
 
 import com.gs.obevo.api.appdata.ChangeInput;
 import com.gs.obevo.db.impl.core.util.RegexpPatterns;
@@ -42,7 +44,7 @@ public final class MsSqlToInMemorySqlTranslator implements PostParsedSqlTranslat
         string = string.replaceAll("(?i)dbo\\.", "");
 
         // only for Sybase ASE - the "modify" keyword should change to "alter column"
-        Matcher modifyMatcher = RegexpPatterns.modifyTablePattern.matcher(string);
+        var modifyMatcher = RegexpPatterns.modifyTablePattern.matcher(string);
         if (modifyMatcher.find()) {
             string = modifyMatcher.replaceFirst("ALTER TABLE " + modifyMatcher.group(1) + " ALTER COLUMN");
         }

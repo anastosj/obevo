@@ -13,9 +13,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.obevo.api.appdata.ChangeInput;
@@ -39,7 +42,7 @@ public class MsSqlToHsqlSqlTranslator implements PostColumnSqlTranslator, PostPa
             }
         }
 
-        Matcher varbinaryDefaultMatcher = this.varbinaryDefaultPattern.matcher(string);
+        var varbinaryDefaultMatcher = this.varbinaryDefaultPattern.matcher(string);
         if (varbinaryDefaultMatcher.find()) {
             string = varbinaryDefaultMatcher.replaceFirst("varbinary(1)" + varbinaryDefaultMatcher.group(1));
         }

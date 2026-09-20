@@ -13,6 +13,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import java.sql.Connection;
@@ -40,7 +44,7 @@ public class MsSqlToHsqlTranslationDialect extends DefaultDbTranslationDialect {
 
     @Override
     public ImmutableList<PrepareDbChange> getAdditionalTranslators() {
-        SqlTranslatorConfigHelper configHelper = SqlTranslatorConfigHelper.createInMemoryDefault();
+        var configHelper = SqlTranslatorConfigHelper.createInMemoryDefault();
         configHelper.setNameMapper(new MsSqlSqlTranslatorNameMapper());
         configHelper.getPostColumnSqlTranslators()
                 .with(new MsSqlToHsqlSqlTranslator());

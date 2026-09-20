@@ -15,6 +15,10 @@
  */
 
 /*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
+
+/*
 // Portions copyright Michael J Lee. Licensed under Apache 2.0 license
 */
 
@@ -27,7 +31,6 @@ import com.gs.obevo.api.platform.ChangeType;
 import com.gs.obevo.apps.reveng.AquaRevengArgs;
 import com.gs.obevo.apps.reveng.ChangeEntry;
 import com.gs.obevo.apps.reveng.RevengPattern;
-import com.gs.obevo.apps.reveng.RevengPattern.NamePatternType;
 import com.gs.obevo.db.apps.reveng.AbstractDdlReveng;
 import com.gs.obevo.impl.reader.TextMarkupDocumentReader;
 import com.gs.obevo.impl.util.MultiLineStringSplitter;
@@ -47,12 +50,9 @@ public class MsSqlReveng extends AbstractDdlReveng {
                         StringPredicates.contains("-- PostgreSQL database dump").and(StringPredicates.contains("-- Dumped by pg_dump"))
                 ),
                 getRevengPatterns(),
-                new Procedure2<ChangeEntry, String>() {
-                    @Override
-                    public void value(ChangeEntry changeEntry, String sql) {
-                        if (sql.contains("\"")) {
-                            changeEntry.addMetadataAnnotation(TextMarkupDocumentReader.TOGGLE_DISABLE_QUOTED_IDENTIFIERS);
-                        }
+                (Procedure2<ChangeEntry, String>) (changeEntry, sql) -> {
+                    if (sql.contains("\"")) {
+                        changeEntry.addMetadataAnnotation(TextMarkupDocumentReader.TOGGLE_DISABLE_QUOTED_IDENTIFIERS);
                     }
                 }
         );
@@ -69,8 +69,8 @@ public class MsSqlReveng extends AbstractDdlReveng {
     }
 
     private static ImmutableList<RevengPattern> getRevengPatterns() {
-        String schemaNameSubPattern = getSchemaObjectPattern("\\[", "\\]");
-        NamePatternType namePatternType = RevengPattern.NamePatternType.TWO;
+        var schemaNameSubPattern = getSchemaObjectPattern("\\[", "\\]");
+        var namePatternType = RevengPattern.NamePatternType.TWO;
 
         return Lists.immutable.with(
                 new RevengPattern(ChangeType.USERTYPE_STR, namePatternType, "(?i)create\\s+type\\s+" + schemaNameSubPattern + "\\s+"),
@@ -116,7 +116,7 @@ public class MsSqlReveng extends AbstractDdlReveng {
     @Override
     protected String getObjectSchema(String inputSchema, String fileName) {
         // for SQL Server, we extract the subschema from the file name if present
-        String[] fileParts = fileName.split("\\.");
+        var fileParts = fileName.split("\\.");
         return fileParts[0].equals("dbo") ? inputSchema : inputSchema + "_" + fileParts[0];
     }
 
@@ -130,11 +130,11 @@ public class MsSqlReveng extends AbstractDdlReveng {
     }
 
     private String getCommandWithDefaults(AquaRevengArgs args, String username, String password, String dbHost, String dbSchema, String outputFile) {
-        return "    SqlServerDdlRevEng " +
-                " " + ObjectUtils.defaultIfNull(args.getOutputPath(), outputFile) +
-                " " + ObjectUtils.defaultIfNull(args.getDbHost(), dbHost) +
-                " " + ObjectUtils.defaultIfNull(args.getDbSchema(), dbSchema) +
-                " " + ObjectUtils.defaultIfNull(args.getUsername(), username) +
-                " " + ObjectUtils.defaultIfNull(args.getPassword(), password);
+        return "    SqlServerDdlRevEng  %s %s %s %s %s".formatted(
+                ObjectUtils.defaultIfNull(args.getOutputPath(), outputFile),
+                ObjectUtils.defaultIfNull(args.getDbHost(), dbHost),
+                ObjectUtils.defaultIfNull(args.getDbSchema(), dbSchema),
+                ObjectUtils.defaultIfNull(args.getUsername(), username),
+                ObjectUtils.defaultIfNull(args.getPassword(), password));
     }
 }

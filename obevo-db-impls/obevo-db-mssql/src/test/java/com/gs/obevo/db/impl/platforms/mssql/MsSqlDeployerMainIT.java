@@ -13,6 +13,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import java.sql.Connection;
@@ -23,7 +27,6 @@ import javax.sql.DataSource;
 
 import com.gs.obevo.db.api.platform.DbDeployerAppContext;
 import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
-import org.apache.commons.dbutils.DbUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,16 +51,16 @@ public class MsSqlDeployerMainIT {
 
     @Test
     public void testAseDeploy() throws Exception {
-        DbDeployerAppContext step1Context = getAppContext.valueOf(1);
+        var step1Context = getAppContext.valueOf(1);
         step1Context
                 .setupEnvInfra()
                 .cleanEnvironment()
                 .deploy();
 
-        String physicalSchemaStr = step1Context.getEnvironment().getPlatform().getSchemaPrefix(step1Context.getEnvironment().getPhysicalSchema("dbdeploy01"));
+        var physicalSchemaStr = step1Context.getEnvironment().getPlatform().getSchemaPrefix(step1Context.getEnvironment().getPhysicalSchema("dbdeploy01"));
         this.validateStep1(step1Context.getDataSource(), physicalSchemaStr, new JdbcHelper());
 
-        DbDeployerAppContext step2Context = getAppContext.valueOf(2);
+        var step2Context = getAppContext.valueOf(2);
         step2Context
                 .setupEnvInfra()
                 .deploy();
@@ -66,11 +69,8 @@ public class MsSqlDeployerMainIT {
 
     private void validateStep1(DataSource ds, String physicalSchemaStr, JdbcHelper jdbc) throws Exception {
         List<Map<String, Object>> results;
-        Connection conn = ds.getConnection();
-        try {
+        try (Connection conn = ds.getConnection()) {
             results = jdbc.queryForList(conn, "select * from " + physicalSchemaStr + "TestTable order by idField");
-        } finally {
-            DbUtils.closeQuietly(conn);
         }
 
         assertEquals(4, results.size());
@@ -82,11 +82,8 @@ public class MsSqlDeployerMainIT {
 
     private void validateStep2(DataSource ds, String physicalSchemaStr, JdbcHelper jdbc) throws Exception {
         List<Map<String, Object>> results;
-        Connection conn = ds.getConnection();
-        try {
+        try (Connection conn = ds.getConnection()) {
             results = jdbc.queryForList(conn, "select * from " + physicalSchemaStr + "TestTable order by idField");
-        } finally {
-            DbUtils.closeQuietly(conn);
         }
 
         assertEquals(5, results.size());

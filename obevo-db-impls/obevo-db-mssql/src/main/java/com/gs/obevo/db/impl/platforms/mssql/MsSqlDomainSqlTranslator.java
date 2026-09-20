@@ -13,18 +13,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import java.util.Arrays;
 
 import com.gs.obevo.api.appdata.ChangeInput;
 import com.gs.obevo.db.impl.platforms.sqltranslator.UnparsedSqlTranslator;
-import com.gs.obevo.db.sqlparser.tokenparser.SqlToken;
 import com.gs.obevo.db.sqlparser.tokenparser.SqlTokenParser;
 import com.gs.obevo.db.sqlparser.tokenparser.SqlTokenType;
 import com.gs.obevo.impl.text.CommentRemover;
-import org.eclipse.collections.api.block.predicate.Predicate;
-import org.eclipse.collections.api.list.MutableList;
 
 public abstract class MsSqlDomainSqlTranslator implements UnparsedSqlTranslator {
     @Override
@@ -32,13 +33,8 @@ public abstract class MsSqlDomainSqlTranslator implements UnparsedSqlTranslator 
         sql = CommentRemover.removeComments(sql, "sybase sp_addtype conversion").trim();
         if (sql.startsWith("sp_addtype")) {
             // all the params are in string literals, e.g. 'param'. Let's extract it out
-            MutableList<SqlToken> allParts = new SqlTokenParser().parseTokens(sql);
-            MutableList<SqlToken> parts = allParts.select(new Predicate<SqlToken>() {
-                @Override
-                public boolean accept(SqlToken it) {
-                    return it.getTokenType().equals(SqlTokenType.STRING);
-                }
-            });
+            var allParts = new SqlTokenParser().parseTokens(sql);
+            var parts = allParts.select(it -> it.getTokenType().equals(SqlTokenType.STRING));
 
             String domainName = null;
             String domainType = null;
@@ -66,8 +62,8 @@ public abstract class MsSqlDomainSqlTranslator implements UnparsedSqlTranslator 
     protected abstract String createDomainSql(String domainName, String domainType, String domainProps);
 
     private String stripAddTypeParam(String param) {
-        int firstQuoteIndex = param.indexOf('\'');
-        int lastQuoteIndex = param.lastIndexOf('\'');
+        var firstQuoteIndex = param.indexOf('\'');
+        var lastQuoteIndex = param.lastIndexOf('\'');
         return param.substring(firstQuoteIndex + 1, lastQuoteIndex);
     }
 }

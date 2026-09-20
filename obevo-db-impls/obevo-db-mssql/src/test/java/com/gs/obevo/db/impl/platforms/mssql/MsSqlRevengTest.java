@@ -13,6 +13,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import java.io.File;
@@ -29,7 +33,7 @@ public class MsSqlRevengTest extends AbstractRevengTest {
     @Test
     @Override
     public void testReverseEngineeringFromFile() throws Exception {
-        AquaRevengArgs args = new AquaRevengArgs();
+        var args = new AquaRevengArgs();
         args.setDbSchema("myschema01");
         args.setGenerateBaseline(false);
         args.setDbHost("myhost.me.com");
@@ -38,7 +42,7 @@ public class MsSqlRevengTest extends AbstractRevengTest {
         args.setUsername("myuser");
         args.setPassword("mypass");
 
-        File outputDir = new File("./target/outputReveng");
+        var outputDir = new File("./target/outputReveng");
         FileUtils.deleteDirectory(outputDir);
         args.setOutputPath(outputDir);
 

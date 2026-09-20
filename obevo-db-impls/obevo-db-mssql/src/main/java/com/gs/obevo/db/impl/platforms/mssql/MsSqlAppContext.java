@@ -13,6 +13,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import com.gs.obevo.api.platform.ChangeType;
@@ -22,17 +26,11 @@ import com.gs.obevo.db.impl.core.DbDeployerAppContextImpl;
 import com.gs.obevo.db.impl.core.envinfrasetup.EnvironmentInfraSetup;
 import com.gs.obevo.db.impl.core.jdbc.DataSourceFactory;
 import com.gs.obevo.impl.ChangeTypeBehaviorRegistry.ChangeTypeBehaviorRegistryBuilder;
-import org.eclipse.collections.api.block.function.Function0;
 
 public class MsSqlAppContext extends DbDeployerAppContextImpl {
 
     public SqlExecutor getSqlExecutor() {
-        return this.singleton("getSqlExecutor", new Function0<MsSqlSqlExecutor>() {
-            @Override
-            public MsSqlSqlExecutor value() {
-                return new MsSqlSqlExecutor(MsSqlAppContext.this.getManagedDataSource());
-            }
-        });
+        return this.singleton("getSqlExecutor", () -> new MsSqlSqlExecutor(this.getManagedDataSource()));
     }
 
     @Override
@@ -42,7 +40,7 @@ public class MsSqlAppContext extends DbDeployerAppContextImpl {
 
     @Override
     protected ChangeTypeBehaviorRegistryBuilder getChangeTypeBehaviors() {
-        DbChangeType usertypeChangeType = (DbChangeType) platform().getChangeType(ChangeType.USERTYPE_STR);
+        var usertypeChangeType = (DbChangeType) platform().getChangeType(ChangeType.USERTYPE_STR);
         return super.getChangeTypeBehaviors()
                 .putBehavior(ChangeType.USERTYPE_STR, new MsSqlUserTypeChangeTypeBehavior(env, usertypeChangeType, getSqlExecutor(), simpleArtifactDeployer(), grantChangeParser(), graphEnricher(), platform(), getDbMetadataManager()));
     }

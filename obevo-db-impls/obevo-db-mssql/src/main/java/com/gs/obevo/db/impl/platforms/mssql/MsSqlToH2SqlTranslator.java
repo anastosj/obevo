@@ -13,9 +13,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.obevo.api.appdata.ChangeInput;
@@ -41,14 +44,14 @@ public class MsSqlToH2SqlTranslator implements PostColumnSqlTranslator, PostPars
                  "ALTER TABLE some_Table ALTER COLUMN abcCol SET NOT NULL"
          */
         //if this is "ALTER TABLE XYZ ALTER COLUMN ABC" statement
-        Matcher alterTableAlterColumnMatcher = Pattern.compile("(?i)(alter\\s+table\\s+\\w+\\s+alter\\s+column\\s+\\w+\\s+)(.+)").matcher(string);
+        var alterTableAlterColumnMatcher = Pattern.compile("(?i)(alter\\s+table\\s+\\w+\\s+alter\\s+column\\s+\\w+\\s+)(.+)").matcher(string);
         if (alterTableAlterColumnMatcher.find()) {
 
             //if this is ALTER TABLE ALTER COLUMN NULL/NOT NULL in Sybase dialect (without "SET" keyword)
             if (!StringUtils.containsIgnoreCase(alterTableAlterColumnMatcher.group(2), "set") &&
                     StringUtils.containsIgnoreCase(alterTableAlterColumnMatcher.group(2), "null")) {
 
-                Matcher nullOrNotNull = Pattern.compile("(?i)(NOT\\s+NULL|NULL)(.*)").matcher(alterTableAlterColumnMatcher.group(2));
+                var nullOrNotNull = Pattern.compile("(?i)(NOT\\s+NULL|NULL)(.*)").matcher(alterTableAlterColumnMatcher.group(2));
                 if (nullOrNotNull.matches()) {
                     string = alterTableAlterColumnMatcher.group(1) + "SET " + nullOrNotNull.group(1) + nullOrNotNull.group(2);
                 }

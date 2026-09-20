@@ -13,6 +13,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.db.impl.platforms.mssql;
 
 import java.sql.Connection;
@@ -20,7 +24,6 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 
 import com.gs.obevo.api.appdata.PhysicalSchema;
-import com.gs.obevo.db.impl.core.jdbc.JdbcHelper;
 import com.gs.obevo.db.impl.platforms.AbstractSqlExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,7 @@ public class MsSqlSqlExecutor extends AbstractSqlExecutor {
 
     @Override
     public void setDataSourceSchema(Connection conn, PhysicalSchema schema) {
-        JdbcHelper jdbc = this.getJdbcTemplate();
+        var jdbc = this.getJdbcTemplate();
         jdbc.update(conn, "use " + schema.getPhysicalName());
     }
 }
