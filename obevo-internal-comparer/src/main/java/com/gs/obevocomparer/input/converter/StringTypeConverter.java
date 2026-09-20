@@ -32,23 +32,17 @@ public class StringTypeConverter extends SimpleTypeConverter {
     }
 
     public Object convert(Object value) {
-        if (value == null) {
-            return value;
-        }
-
         if (!(value instanceof String)) {
             return value;
         }
 
-        Object str = this.handleString(value);
-
-        return str;
+        return this.handleString(value);
     }
 
     Object handleString(Object value) {
-        String str = value.toString().trim();
+        String str = value.toString().strip();
 
-        if (str.length() == 0) {
+        if (str.isEmpty()) {
             return null;
         }
 
@@ -94,7 +88,7 @@ public class StringTypeConverter extends SimpleTypeConverter {
     }
 
     private List<DateFormat> createDateFormats(String[] dateFormatStrs) {
-        List<DateFormat> dateFormats = new ArrayList<DateFormat>();
+        List<DateFormat> dateFormats = new ArrayList<>();
         SimpleDateFormat dateFormat;
 
         for (String format : dateFormatStrs) {

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.gs.obevocomparer.compare.CatoComparison;
@@ -34,25 +35,24 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
 
     private final CatoComparison comparison;
 
-    private final Set<String> leftFields = new LinkedHashSet<String>();
-    private final Set<String> rightFields = new LinkedHashSet<String>();
+    private final Set<String> leftFields = new LinkedHashSet<>();
+    private final Set<String> rightFields = new LinkedHashSet<>();
 
-    private final Set<String> fieldBreakFields = new LinkedHashSet<String>();
-    private final Set<String> includedFieldBreakFields = new LinkedHashSet<String>();
-    private final Set<String> excludedFieldBreakFields = new LinkedHashSet<String>();
-    private final Set<String> groupBreakFields = new LinkedHashSet<String>();
+    private final Set<String> fieldBreakFields = new LinkedHashSet<>();
+    private final Set<String> includedFieldBreakFields = new LinkedHashSet<>();
+    private final Set<String> excludedFieldBreakFields = new LinkedHashSet<>();
+    private final Set<String> groupBreakFields = new LinkedHashSet<>();
 
     private int includedBreakSize = 0;
     private int excludedBreakSize = 0;
     private boolean hasGroupBreaks;
 
-    private final Map<String, SimpleBreakTypeInfo> breakTypeInfoMap = new HashMap<String, SimpleBreakTypeInfo>();
+    private final Map<String, SimpleBreakTypeInfo> breakTypeInfoMap = new HashMap<>();
 
     public SimpleComparisonMetadata(CatoComparison comparison) {
 
         this.comparison = comparison;
 
-        FieldBreak fbr;
         String extraRecordBreak = "Only in " + comparison.getLeftDataSource().getShortName();
         String missingRecordBreak = "Only in " + comparison.getRightDataSource().getShortName();
 
@@ -69,8 +69,7 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
                 this.rightFields.addAll(br.getDataObject().getFields());
             }
 
-            if (br instanceof FieldBreak) {
-                fbr = (FieldBreak) br;
+            if (br instanceof FieldBreak fbr) {
                 for (String field : fbr.getFields()) {
                     this.fieldBreakFields.add(field);
 
@@ -90,9 +89,9 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
                 }
             }
 
-            if (br instanceof GroupBreak) {
+            if (br instanceof GroupBreak groupBreak) {
                 this.hasGroupBreaks = true;
-                this.groupBreakFields.addAll(((GroupBreak) br).getFields());
+                this.groupBreakFields.addAll(groupBreak.getFields());
             }
         }
     }
@@ -114,7 +113,7 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
     }
 
     public List<BreakTypeInfo> getBreakTypeInfo() {
-        List<BreakTypeInfo> breakTypeInfoList = new ArrayList<BreakTypeInfo>(this.breakTypeInfoMap.values());
+        List<BreakTypeInfo> breakTypeInfoList = new ArrayList<>(this.breakTypeInfoMap.values());
         Collections.sort(breakTypeInfoList);
         return breakTypeInfoList;
     }
@@ -210,11 +209,9 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof SimpleBreakTypeInfo)) {
+            if (!(o instanceof SimpleBreakTypeInfo that)) {
                 return false;
             }
-
-            SimpleBreakTypeInfo that = (SimpleBreakTypeInfo) o;
 
             if (breakCount != that.breakCount) {
                 return false;
@@ -222,7 +219,7 @@ public class SimpleComparisonMetadata implements CatoComparisonMetadata {
             if (excludeCount != that.excludeCount) {
                 return false;
             }
-            return !(type != null ? !type.equals(that.type) : that.type != null);
+            return Objects.equals(type, that.type);
         }
 
         @Override

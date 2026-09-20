@@ -15,7 +15,6 @@
  */
 package com.gs.obevocomparer.compare.simple;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,7 @@ public class SimpleCatoDatabaseProperties extends SimpleCatoProperties implement
     }
 
     public SimpleCatoDatabaseProperties() {
-        super(Collections.<String>emptyList());
+        super(List.of());
     }
 
     public String getCompareQuery() {

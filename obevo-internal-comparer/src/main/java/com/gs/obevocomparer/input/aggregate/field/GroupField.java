@@ -30,7 +30,7 @@ public class GroupField extends AbstractAggregateField<Object, Set<Object>> {
 
     @Override
     protected Set<Object> getInitialValue() {
-        return new LinkedHashSet<Object>();
+        return new LinkedHashSet<>();
     }
 
     @Override

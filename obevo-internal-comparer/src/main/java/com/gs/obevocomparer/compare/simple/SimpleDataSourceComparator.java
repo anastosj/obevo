@@ -86,10 +86,10 @@ public class SimpleDataSourceComparator implements CatoDataSourceComparator {
         Collection<Break> breaks = this.breakCollectionFactory.create();
 
         SortedGroupIterator<CatoDataObject> leftGroupIter =
-                new SortedGroupIterator<CatoDataObject>(sortedLeftData, this.dataObjectComparator);
+                new SortedGroupIterator<>(sortedLeftData, this.dataObjectComparator);
 
         SortedGroupIterator<CatoDataObject> rightGroupIter =
-                new SortedGroupIterator<CatoDataObject>(sortedRightData, this.dataObjectComparator);
+                new SortedGroupIterator<>(sortedRightData, this.dataObjectComparator);
 
         List<CatoDataObject> leftGroup = leftGroupIter.next();
         List<CatoDataObject> rightGroup = rightGroupIter.next();
@@ -161,8 +161,8 @@ public class SimpleDataSourceComparator implements CatoDataSourceComparator {
             LOG.warn("Large group of size {} being compared", leftGroup.size());
         }
 
-        List<CatoDataObject> leftCompareGroup = new ArrayList<CatoDataObject>(leftGroup);
-        List<CatoDataObject> rightCompareGroup = new ArrayList<CatoDataObject>(rightGroup);
+        List<CatoDataObject> leftCompareGroup = new ArrayList<>(leftGroup);
+        List<CatoDataObject> rightCompareGroup = new ArrayList<>(rightGroup);
         CatoDataObject leftObj;
         CatoDataObject rightObj;
 
@@ -178,7 +178,7 @@ public class SimpleDataSourceComparator implements CatoDataSourceComparator {
             }
         }
 
-        Set<String> breakFields = new LinkedHashSet<String>();
+        Set<String> breakFields = new LinkedHashSet<>();
         for (CatoDataObject leftObject : leftCompareGroup) {
             for (CatoDataObject rightObject : rightCompareGroup) {
                 fieldBreak = this.compareDataObjects(leftObject, rightObject);
@@ -205,8 +205,8 @@ public class SimpleDataSourceComparator implements CatoDataSourceComparator {
 
         Object leftVal;
         Object rightVal;
-        Set<String> comparedRightFields = new HashSet<String>();
-        Map<String, Object> fieldBreaks = new HashMap<String, Object>();
+        Set<String> comparedRightFields = new HashSet<>();
+        Map<String, Object> fieldBreaks = new HashMap<>();
 
         for (String field : leftObj.getFields()) {
             if (this.properties.getExcludeFields().contains(field)) {

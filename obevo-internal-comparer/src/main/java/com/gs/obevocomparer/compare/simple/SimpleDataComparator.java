@@ -60,20 +60,20 @@ public class SimpleDataComparator implements CatoDataComparator {
             return -1;
         }
 
-        if (val1 instanceof Number && val2 instanceof Number) {
+        if (val1 instanceof Number num1 && val2 instanceof Number num2) {
             if (compareKey) {
-                return this.roundCompare((Number) val1, (Number) val2);
+                return this.roundCompare(num1, num2);
             } else {
-                return this.subtractCompare((Number) val1, (Number) val2);
+                return this.subtractCompare(num1, num2);
             }
         }
 
-        if (val1 instanceof String && val2 instanceof String) {
-            return ((String) val1).trim().compareTo(((String) val2).trim());
+        if (val1 instanceof String str1 && val2 instanceof String str2) {
+            return str1.strip().compareTo(str2.strip());
         }
 
-        if (val1 instanceof Date && val2 instanceof Date) {
-            return Long.valueOf(((Date) val1).getTime()).compareTo(((Date) val2).getTime());
+        if (val1 instanceof Date date1 && val2 instanceof Date date2) {
+            return Long.compare(date1.getTime(), date2.getTime());
         }
 
         if (compareKey) {

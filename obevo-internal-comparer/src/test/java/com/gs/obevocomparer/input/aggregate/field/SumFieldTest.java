@@ -41,7 +41,7 @@ public class SumFieldTest {
 
     @Test
     public void testGetValue() {
-        List<CatoDataObject> objs = new ArrayList<CatoDataObject>();
+        var objs = new ArrayList<CatoDataObject>();
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", 3.5, "Val 2", 13));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", -4, "Val 2", 14));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", (short) 5, "Val 2", 15));
@@ -56,7 +56,7 @@ public class SumFieldTest {
     @Test
     public void testGetValueWithInvalidTypes() {
 
-        List<CatoDataObject> objs = new ArrayList<CatoDataObject>();
+        var objs = new ArrayList<CatoDataObject>();
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", 5.5, "Val 2", 15));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", "abc", "Val 2", 13));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", null, "Val 2", null));

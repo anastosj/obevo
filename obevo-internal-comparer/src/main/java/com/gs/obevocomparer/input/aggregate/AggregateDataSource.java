@@ -71,7 +71,7 @@ public class AggregateDataSource extends AbstractCatoWrapperDataSource {
         super.open();
 
         Iterator<CatoDataObject> sortedData = this.baseDataSource.isSorted() ? this.baseDataSource : this.sort.sort(this.baseDataSource);
-        this.sortedGroupData = new SortedGroupIterator<CatoDataObject>(sortedData, this.dataObjectComparator);
+        this.sortedGroupData = new SortedGroupIterator<>(sortedData, this.dataObjectComparator);
     }
 
     @Override

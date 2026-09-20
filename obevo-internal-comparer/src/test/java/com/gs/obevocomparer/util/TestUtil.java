@@ -37,10 +37,10 @@ import org.junit.Ignore;
 @Ignore("Only a test utility; no tests to run here")
 public class TestUtil {
 
-    public static final List<String> KEY_FIELDS = Arrays.asList("Key 1", "Key 2");
-    public static final List<String> ATTR_FIELDS = Arrays.asList("Val 1", "Val 2", "Val 3");
-    public static final List<String> EXCLUDE_FIELDS = Arrays.asList("Val 4");
-    public static final List<String> ALL_FIELDS = Arrays.asList("Key 1", "Key 2", "Val 1", "Val 2", "Val 3", "Val 4");
+    public static final List<String> KEY_FIELDS = List.of("Key 1", "Key 2");
+    public static final List<String> ATTR_FIELDS = List.of("Val 1", "Val 2", "Val 3");
+    public static final List<String> EXCLUDE_FIELDS = List.of("Val 4");
+    public static final List<String> ALL_FIELDS = List.of("Key 1", "Key 2", "Val 1", "Val 2", "Val 3", "Val 4");
 
     public static SimpleDataSchema createSchema() {
         return new SimpleDataSchema();
@@ -83,7 +83,7 @@ public class TestUtil {
     }
 
     public static List<CatoDataObject> getData(CatoDataSource dataSource) {
-        List<CatoDataObject> data = new ArrayList<CatoDataObject>();
+        var data = new ArrayList<CatoDataObject>();
 
         if (dataSource instanceof AbstractCatoDataSource) {
             ((AbstractCatoDataSource) dataSource).setDataSchema(createSchema());

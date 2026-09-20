@@ -49,7 +49,7 @@ public class SimpleBreakWriterTest {
     @Test
     public void dataObjectBreakTest() throws Exception {
 
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
         breaks.add(new DataObjectBreak(this.create("a", 1, "b", 2, "c", 3, "d", 4, "f", 10, "x", 5, "y", 6), LEFT));
         breaks.add(new DataObjectBreak(this.create("a", 1, "b", 3, "c", 8, "d", 9, "x", 10, "y", 11), LEFT));
         breaks.add(new DataObjectBreak(this.create("a", 1, "b", 4, "c", 10, "d", 11, "x", 15, "y", 16), RIGHT));
@@ -73,7 +73,7 @@ public class SimpleBreakWriterTest {
     @Test
     public void groupBreakTest() throws Exception {
 
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
         List<String> fields = asList("c");
         breaks.add(new GroupBreak(this.create("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "x", 5, "y", 6), LEFT, fields, 1));
         breaks.add(new GroupBreak(this.create("a", 1, "b", 2, "c", 8, "d", 9, "e", 21, "x", 10, "y", 11), RIGHT, fields, 1));
@@ -99,7 +99,7 @@ public class SimpleBreakWriterTest {
     @Test
     public void fieldBreakTest() throws Exception {
         FieldBreak br;
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
 
         breaks.add(new FieldBreak(this.create("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "f", 6, "x", 5, "y", 6),
                 createBreakMap("c", 5)));
@@ -126,7 +126,7 @@ public class SimpleBreakWriterTest {
 
     @Test
     public void allBreakTypesTest() throws Exception {
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
 
         breaks.add(new DataObjectBreak(this.create("a", 1, "b", 10, "c", 1, "d", 2, "e", 5, "f", 6, "x", 3, "y", 4),
                 LEFT));
@@ -165,7 +165,7 @@ public class SimpleBreakWriterTest {
 
     @Test
     public void simpleMappedFieldsTest() throws Exception {
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
 
         breaks.add(new FieldBreak(this.create("a", 1, "b", 2, "c", 3, "e", 5, "x", 5), createBreakMap("c", 15)));
         breaks.add(new DataObjectBreak(this.create("a", 1, "b", 3, "c", 8, "e", 21, "x", 10), LEFT));
@@ -189,7 +189,7 @@ public class SimpleBreakWriterTest {
 
     @Test
     public void complexMappedFieldsTest() throws Exception {
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
 
         breaks.add(new FieldBreak(this.create("a", 1, "b", 2, "c", 3, "d", 4, "e", 15, "x", 5),
                 createBreakMap("c", 15, "d", 15)));
@@ -216,7 +216,7 @@ public class SimpleBreakWriterTest {
     @Test
     public void reorderDataObjectBreakTest() throws Exception {
 
-        List<Break> breaks = new ArrayList<Break>();
+        var breaks = new ArrayList<Break>();
         breaks.add(new DataObjectBreak(this.create("x", 5, "c", 3, "a", 1, "y", 6, "b", 2, "d", 4, "f", 10), LEFT));
         breaks.add(new DataObjectBreak(this.create("x", 10, "c", 8, "a", 1, "y", 11, "b", 3, "d", 9), LEFT));
         breaks.add(new DataObjectBreak(this.create("x", 15, "c", 10, "a", 1, "y", 16, "b", 4, "d", 11), RIGHT));
@@ -262,7 +262,7 @@ public class SimpleBreakWriterTest {
     }
 
     private static Map<String, Object> createBreakMap(Object... data) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        var map = new HashMap<String, Object>();
         for (int i = 0; i < data.length; i += 2) {
             map.put(data[i].toString(), data[i + 1]);
         }
@@ -283,8 +283,8 @@ public class SimpleBreakWriterTest {
     private CatoComparison getComparison(List<Break> breaks) {
         return new CatoComparison("Test", new SimpleCatoProperties(this.keyFields, this.excludeFields),
                 breaks,
-                new MockDataSource("C"), Collections.<CatoDataObject>emptyList(),
-                new MockDataSource("R"), Collections.<CatoDataObject>emptyList());
+                new MockDataSource("C"), List.<CatoDataObject>of(),
+                new MockDataSource("R"), List.<CatoDataObject>of());
     }
 
     private static final ValueType N = null;

@@ -50,7 +50,7 @@ public class AggregateDataSourceTest {
 
         this.baseDataSource.addData(TestUtil.createDataObjectWithKeys("A", "ghi", "B", 3, "C", 2.0));
 
-        this.dataSource.setSort(new MemorySort<CatoDataObject>(new SimpleDataObjectComparator(new SimpleDataComparator(), this.keyFields)));
+        this.dataSource.setSort(new MemorySort<>(new SimpleDataObjectComparator(new SimpleDataComparator(), this.keyFields)));
         this.dataSource.setDataObjectComparator(new SimpleDataObjectComparator(new SimpleDataComparator(), this.keyFields));
         this.dataSource.setDataSchema(new SimpleDataSchema());
 

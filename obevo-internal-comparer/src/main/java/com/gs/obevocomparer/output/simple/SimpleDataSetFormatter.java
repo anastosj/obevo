@@ -80,7 +80,7 @@ public class SimpleDataSetFormatter implements CatoContentFormatter {
     }
 
     private Map<String, Integer> calculateFieldMap(Collection<CatoDataObject> data) {
-        Map<String, Integer> fieldMap = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> fieldMap = new LinkedHashMap<>();
 
         for (CatoDataObject object : data) {
             for (String field : object.getFields()) {

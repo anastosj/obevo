@@ -26,7 +26,7 @@ public class DelimitedStreamDataSource extends AbstractStreamDataSource {
     private final String delimiter;
 
     public DelimitedStreamDataSource(String name, Reader reader, String delimiter) {
-        this(name, reader, new ArrayList<String>(), delimiter);
+        this(name, reader, new ArrayList<>(), delimiter);
         this.setHeader(true);
     }
 

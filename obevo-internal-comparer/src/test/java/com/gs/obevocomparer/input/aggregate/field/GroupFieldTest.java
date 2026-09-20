@@ -43,7 +43,7 @@ public class GroupFieldTest {
 
     @Test
     public void testGetValue() {
-        List<CatoDataObject> objs = new ArrayList<CatoDataObject>();
+        var objs = new ArrayList<CatoDataObject>();
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", null, "Val 2", 13));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", -4, "Val 2", 14));
         objs.add(TestUtil.createDataObjectWithKeys("Val 1", "abc", "Val 2", 15));
@@ -53,7 +53,7 @@ public class GroupFieldTest {
 
         this.field = new GroupField("Val 1");
 
-        Set<Object> expectedValue = new LinkedHashSet<Object>();
+        var expectedValue = new LinkedHashSet<>();
         expectedValue.addAll(Arrays.<Object>asList(null, -4, "abc", "def"));
         Set<Object> actualValue = this.field.getValue(objs);
 

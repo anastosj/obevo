@@ -107,13 +107,7 @@ public class CatoTypeConvertersTest {
     @Test
     public void testCustomConversion() {
 
-        Function converter = new Function() {
-
-            @Override
-            public Object valueOf(Object arg0) {
-                return (String) arg0 + "-custom";
-            }
-        };
+        Function<Object, Object> converter = arg0 -> (String) arg0 + "-custom";
 
         org.junit.Assert.assertEquals("string-custom", CatoTypeConverters.newCustomTypeConverter(converter).convert("string"));
     }

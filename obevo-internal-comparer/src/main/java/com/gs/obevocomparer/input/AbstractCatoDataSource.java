@@ -34,7 +34,7 @@ public abstract class AbstractCatoDataSource implements CatoDataSource {
     private CatoDataSchema dataSchema;
     private CatoTypeConverter typeConverter;
 
-    private final Collection<CatoDerivedField> derivedFields = new ArrayList<CatoDerivedField>();
+    private final Collection<CatoDerivedField> derivedFields = new ArrayList<>();
 
     private boolean open = false;
     private boolean closed = false;

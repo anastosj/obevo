@@ -52,32 +52,15 @@ public class HTMLContentWriter implements CatoContentWriter {
         this.htmlString.append("<tr class=\"cato-content-row\" id=\"cato-content-row-").append(this.rowCount).append("\">");
         for (int i = 0; i < row.getSize(); i++) {
             this.htmlString.append("<td id=\"cato-content-row-").append(this.rowCount).append("-").append(i).append("\">");
-            String cssClass = "cato-unknown";
-            if (row.getValueType(i) != null) {
-                switch (row.getValueType(i)) {
-                case KEY:
-                    cssClass = "cato-key";
-                    break;
-                case FIELD_BREAK:
-                    cssClass = "cato-field-break";
-                    break;
-                case RIGHT_VALUE:
-                    cssClass = "cato-right-value";
-                    break;
-                case RIGHT_ONLY:
-                    cssClass = "cato-right-only";
-                    break;
-                case LEFT_ONLY:
-                    cssClass = "cato-left-only";
-                    break;
-                case EXCLUDE:
-                    cssClass = "cato-exclude";
-                    break;
-                case TITLE:
-                    cssClass = "cato-title";
-                    break;
-                }
-            }
+            String cssClass = row.getValueType(i) == null ? "cato-unknown" : switch (row.getValueType(i)) {
+                case KEY -> "cato-key";
+                case FIELD_BREAK -> "cato-field-break";
+                case RIGHT_VALUE -> "cato-right-value";
+                case RIGHT_ONLY -> "cato-right-only";
+                case LEFT_ONLY -> "cato-left-only";
+                case EXCLUDE -> "cato-exclude";
+                case TITLE -> "cato-title";
+            };
             if (row.getValue(i) == null) {
                 this.htmlString.append("<div class=\"").append(cssClass).append("\">").append("-").append("</div>");
             } else {

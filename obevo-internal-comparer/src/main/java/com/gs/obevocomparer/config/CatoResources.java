@@ -63,14 +63,12 @@ public class CatoResources {
 
     private CatoResources(File resFile) throws CatoResourcesException {
         File resourcesFile = resFile;
-        try {
-            FileInputStream fis = new FileInputStream(resourcesFile);
+        try (FileInputStream fis = new FileInputStream(resourcesFile)) {
             this.initialize(fis);
-            fis.close();
         } catch (FileNotFoundException e) {
             LOG.warn("Unable to read the resources xml - {}. Will continue with empty config and create one on exit.", resourcesFile.getName());
-            this.dataSources = new HashMap<String, DataSourceConfig>();
-            this.recons = new HashMap<String, ReconConfig>();
+            this.dataSources = new HashMap<>();
+            this.recons = new HashMap<>();
         } catch (IOException e) {
             throw new CatoResourcesException(
                     "Unable to read the resources xml - "
@@ -80,8 +78,8 @@ public class CatoResources {
 
     private void initialize(InputStream xmlInputStream)
             throws CatoResourcesException {
-        this.dataSources = new HashMap<String, DataSourceConfig>();
-        this.recons = new HashMap<String, ReconConfig>();
+        this.dataSources = new HashMap<>();
+        this.recons = new HashMap<>();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -149,13 +147,7 @@ public class CatoResources {
                     LOG.info("Added new recon - {}", rc);
                 }
             }
-        } catch (ParserConfigurationException e) {
-            throw new CatoResourcesException(
-                    "Unable to read the resources xml - ", e);
-        } catch (SAXException e) {
-            throw new CatoResourcesException(
-                    "Unable to read the resources xml - ", e);
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new CatoResourcesException(
                     "Unable to read the resources xml - ", e);
         }
@@ -329,8 +321,7 @@ public class CatoResources {
 
     private void writeDataSourcesToElement(Element dataSourcesElem) {
         for (DataSourceConfig dsc : this.dataSources.values()) {
-            if (dsc instanceof DatabaseConfig) {
-                DatabaseConfig dbdsc = (DatabaseConfig) dsc;
+            if (dsc instanceof DatabaseConfig dbdsc) {
                 Element dbElem = dataSourcesElem.getOwnerDocument()
                         .createElement("DBDataSource");
                 dbElem.setAttribute("id", dbdsc.getName());
@@ -341,8 +332,7 @@ public class CatoResources {
                 this.addChildElement(dbElem, "user", dbdsc.getUser());
                 this.addChildElement(dbElem, "password", dbdsc.getPassword());
                 dataSourcesElem.appendChild(dbElem);
-            } else if (dsc instanceof TextConfig) {
-                TextConfig tc = (TextConfig) dsc;
+            } else if (dsc instanceof TextConfig tc) {
                 Element tcElem = dataSourcesElem.getOwnerDocument()
                         .createElement("TextDataSource");
                 tcElem.setAttribute("id", tc.getName());

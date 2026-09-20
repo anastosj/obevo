@@ -24,9 +24,9 @@ import com.gs.obevocomparer.data.CatoDataSchema;
 
 public class SimpleDataSchema implements CatoDataSchema {
 
-    private final Map<String, Integer> fieldMap = new LinkedHashMap<String, Integer>();
+    private final Map<String, Integer> fieldMap = new LinkedHashMap<>();
 
-    private final Map<String, String> mappedFields = new HashMap<String, String>();
+    private final Map<String, String> mappedFields = new HashMap<>();
 
     public SimpleDataSchema() {
     }

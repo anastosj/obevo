@@ -29,7 +29,7 @@ public class SimpleDataSchemaTest {
     public void testConstructor() {
         Assert.assertEquals(0, this.schema.getMappedFields().size());
 
-        Map<String, String> mappedFields = new HashMap<String, String>();
+        var mappedFields = new HashMap<String, String>();
         mappedFields.put("Test1", "Test1 Ref");
         mappedFields.put("Test2", "Test2 Ref");
         this.schema = new SimpleDataSchema(mappedFields);

@@ -34,7 +34,7 @@ public class SimpleBreakExcluderTest {
     private final SimpleBreakExcluder breakExcluder = new SimpleBreakExcluder(new SimpleDataComparator());
     private Iterable<Break> breaks;
 
-    private final List<BreakExclude> breakExcludes = new ArrayList<BreakExclude>();
+    private final List<BreakExclude> breakExcludes = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {

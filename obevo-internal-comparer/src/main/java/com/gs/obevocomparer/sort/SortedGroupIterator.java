@@ -46,7 +46,7 @@ public class SortedGroupIterator<T> implements Iterator<List<T>> {
             return Collections.emptyList();
         }
 
-        List<T> group = new ArrayList<T>();
+        List<T> group = new ArrayList<>();
         int compare = 0;
         T curr = null;
 

@@ -35,7 +35,7 @@ public class FieldBreakTest {
     public static void setUp() {
         obj = TestUtil.createDataObject(1, 2, "a", "b", "c", "d");
 
-        fieldBreaks = new HashMap<String, Object>();
+        fieldBreaks = new HashMap<>();
         for (int i = 0; i < 2; i++) {
             fieldBreaks.put(TestUtil.ATTR_FIELDS.get(i), i);
         }

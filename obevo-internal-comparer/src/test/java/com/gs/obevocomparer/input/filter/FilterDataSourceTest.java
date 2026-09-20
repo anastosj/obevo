@@ -58,7 +58,7 @@ public class FilterDataSourceTest {
     public void testFilteringDataSource() {
         MockDataSource dataSource = new MockDataSource();
 
-        List<CatoDataObject> objs = new ArrayList<CatoDataObject>();
+        var objs = new ArrayList<CatoDataObject>();
         for (int i = 0; i < 6; i++) {
             objs.add(TestUtil.createEmptyDataObject());
             dataSource.addData(objs.get(i));

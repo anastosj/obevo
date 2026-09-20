@@ -22,7 +22,7 @@ import java.util.List;
 
 public class FixedStreamDataSource extends AbstractStreamDataSource {
 
-    private final List<FixedField> fixedFields = new ArrayList<FixedField>();
+    private final List<FixedField> fixedFields = new ArrayList<>();
 
     public FixedStreamDataSource(String name, Reader reader, Object... fieldInput) {
         super(name, reader);
@@ -57,7 +57,7 @@ public class FixedStreamDataSource extends AbstractStreamDataSource {
         Collections.sort(this.fixedFields);
         this.fields.clear();
         for (FixedField field : this.fixedFields) {
-            this.fields.add(field.field);
+            this.fields.add(field.field());
         }
     }
 
@@ -65,62 +65,21 @@ public class FixedStreamDataSource extends AbstractStreamDataSource {
         String[] data = new String[this.fixedFields.size()];
 
         for (int i = 0; i < this.fixedFields.size(); i++) {
-            if (line.length() <= this.fixedFields.get(i).end) {
-                data[i] = line.substring(this.fixedFields.get(i).start);
+            if (line.length() <= this.fixedFields.get(i).end()) {
+                data[i] = line.substring(this.fixedFields.get(i).start());
             } else {
-                data[i] = line.substring(this.fixedFields.get(i).start, this.fixedFields.get(i).end);
+                data[i] = line.substring(this.fixedFields.get(i).start(), this.fixedFields.get(i).end());
             }
         }
 
         return data;
     }
 
-    private static class FixedField implements Comparable<FixedField> {
-        final String field;
-        final int start;
-        final int end;
-
-        FixedField(String field, int start, int end) {
-            this.field = field;
-            this.start = start;
-            this.end = end;
-        }
-
+    private record FixedField(String field, int start, int end) implements Comparable<FixedField> {
+        @Override
         public int compareTo(FixedField o) {
-            int val = Integer.valueOf(this.start).compareTo(o.start);
-            if (val == 0) {
-                return Integer.valueOf(this.end).compareTo(o.end);
-            } else {
-                return val;
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof FixedField)) {
-                return false;
-            }
-
-            FixedField that = (FixedField) o;
-
-            if (start != that.start) {
-                return false;
-            }
-            if (end != that.end) {
-                return false;
-            }
-            return !(field != null ? !field.equals(that.field) : that.field != null);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = field != null ? field.hashCode() : 0;
-            result = 31 * result + start;
-            result = 31 * result + end;
-            return result;
+            int val = Integer.compare(this.start, o.start);
+            return val == 0 ? Integer.compare(this.end, o.end) : val;
         }
     }
 }

@@ -29,7 +29,7 @@ public class MockDataSource implements CatoDataSource {
 
     private final String name;
 
-    private final List<CatoDataObject> data = new ArrayList<CatoDataObject>();
+    private final List<CatoDataObject> data = new ArrayList<>();
     private Iterator<CatoDataObject> iter;
 
     public MockDataSource() {

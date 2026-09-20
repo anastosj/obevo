@@ -27,7 +27,7 @@ class FilterDataSource extends AbstractCatoWrapperDataSource {
 
     public FilterDataSource(CatoDataSource baseDataSource, Predicate<CatoDataObject> discriminator) {
         super(baseDataSource);
-        this.iterator = new SelectIterator<CatoDataObject>(baseDataSource, discriminator);
+        this.iterator = new SelectIterator<>(baseDataSource, discriminator);
     }
 
     @Override

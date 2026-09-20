@@ -35,8 +35,7 @@ public class SimpleBreakExcluder implements CatoBreakExcluder {
 
     public void excludeBreaks(Iterable<Break> breaks, Collection<BreakExclude> breakExcludes) {
 
-        Collection<String> fields = new HashSet<String>();
-        FieldBreak fieldBreak;
+        Collection<String> fields = new HashSet<>();
 
         for (Break br : breaks) {
             fields.clear();
@@ -51,9 +50,7 @@ public class SimpleBreakExcluder implements CatoBreakExcluder {
                     break;
                 }
 
-                if (br instanceof FieldBreak) {
-                    fieldBreak = (FieldBreak) br;
-
+                if (br instanceof FieldBreak fieldBreak) {
                     for (String field : fieldBreak.getFields()) {
                         if (this.matchesData(exclude, field, fieldBreak.getActualValue(field), fieldBreak.getExpectedValue(field))) {
                             fieldBreak.setExcluded(field, true);
@@ -63,7 +60,7 @@ public class SimpleBreakExcluder implements CatoBreakExcluder {
                 }
             }
 
-            if (br instanceof FieldBreak && fields.size() == ((FieldBreak) br).getFields().size()) {
+            if (br instanceof FieldBreak fieldBreak && fields.size() == fieldBreak.getFields().size()) {
                 br.setExcluded(true);
             }
         }

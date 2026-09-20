@@ -42,7 +42,7 @@ public class ReconConfig {
     }
 
     private void init() {
-        this.allFields = new ArrayList<ReconFieldConfig>();
+        this.allFields = new ArrayList<>();
     }
 
     public String getReconName() {
@@ -75,7 +75,7 @@ public class ReconConfig {
         sb.append("Name - ").append(this.name);
         sb.append(", Data Source 1 - ").append(this.dataSource1.getName());
         sb.append(", Data Source 2 - ").append(this.dataSource2.getName());
-        if (this.allFields.size() > 0) {
+        if (!this.allFields.isEmpty()) {
             for (ReconFieldConfig rfc : this.allFields) {
                 sb.append("\n").append(rfc);
             }
@@ -97,22 +97,17 @@ public class ReconConfig {
 
     public void setAllField(String fields, String keyFields,
             String attrbuteFields, String excludedFields) {
-        String[] all = fields.split(FIELDS_DELIMITER);
-        for (int i = 0; i < all.length; i++) {
-            String keyName = all[i].trim();
-            this.allFields.add(new ReconFieldConfig(keyName));
+        for (String field : fields.split(FIELDS_DELIMITER)) {
+            this.allFields.add(new ReconFieldConfig(field.strip()));
         }
-        String[] keys = keyFields.split(FIELDS_DELIMITER);
-        for (int i = 0; i < keys.length; i++) {
-            this.getField(keys[i]).setKey(true);
+        for (String key : keyFields.split(FIELDS_DELIMITER)) {
+            this.getField(key).setKey(true);
         }
-        String[] attributes = attrbuteFields.split(FIELDS_DELIMITER);
-        for (int i = 0; i < attributes.length; i++) {
-            this.getField(attributes[i]).setAttribute(true);
+        for (String attribute : attrbuteFields.split(FIELDS_DELIMITER)) {
+            this.getField(attribute).setAttribute(true);
         }
-        String[] excludes = excludedFields.split(FIELDS_DELIMITER);
-        for (int i = 0; i < excludes.length; i++) {
-            this.getField(excludes[i]).setExcluded(true);
+        for (String exclude : excludedFields.split(FIELDS_DELIMITER)) {
+            this.getField(exclude).setExcluded(true);
         }
     }
 
@@ -126,30 +121,22 @@ public class ReconConfig {
     }
 
     public List<String> getKeyFields() {
-        List<String> keys = new ArrayList<String>();
-        for (ReconFieldConfig rfc : this.allFields) {
-            if (rfc.isKey()) {
-                keys.add(rfc.getName());
-            }
-        }
-        return keys;
+        return this.allFields.stream()
+                .filter(ReconFieldConfig::isKey)
+                .map(ReconFieldConfig::getName)
+                .toList();
     }
 
     public List<String> getFields() {
-        List<String> attributes = new ArrayList<String>();
-        for (ReconFieldConfig rfc : this.allFields) {
-            attributes.add(rfc.getName());
-        }
-        return attributes;
+        return this.allFields.stream()
+                .map(ReconFieldConfig::getName)
+                .toList();
     }
 
     public List<String> getExcludedFields() {
-        List<String> excludes = new ArrayList<String>();
-        for (ReconFieldConfig rfc : this.allFields) {
-            if (rfc.isExcluded()) {
-                excludes.add(rfc.getName());
-            }
-        }
-        return excludes;
+        return this.allFields.stream()
+                .filter(ReconFieldConfig::isExcluded)
+                .map(ReconFieldConfig::getName)
+                .toList();
     }
 }

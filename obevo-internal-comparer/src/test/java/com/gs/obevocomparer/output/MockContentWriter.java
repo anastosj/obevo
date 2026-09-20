@@ -21,7 +21,7 @@ import java.util.List;
 
 public class MockContentWriter implements CatoContentWriter {
 
-    private final List<CatoContentRow> rows = new ArrayList<CatoContentRow>();
+    private final List<CatoContentRow> rows = new ArrayList<>();
 
     public List<CatoContentRow> getRows() {
         return this.rows;

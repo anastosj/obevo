@@ -35,9 +35,9 @@ public class DelimitedField extends AbstractDerivedField<String> {
 
     protected Object getValue(String sourceValue) {
         StringTokenizer tokenizer = new StringTokenizer(sourceValue, this.delim);
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
-            tokens.add(tokenizer.nextToken().trim());
+            tokens.add(tokenizer.nextToken().strip());
         }
 
         Collections.sort(tokens);
@@ -47,6 +47,6 @@ public class DelimitedField extends AbstractDerivedField<String> {
             value.append(token).append(this.delim);
         }
 
-        return tokens.size() > 0 ? value.substring(0, value.length() - this.delim.length()) : value.toString();
+        return !tokens.isEmpty() ? value.substring(0, value.length() - this.delim.length()) : value.toString();
     }
 }

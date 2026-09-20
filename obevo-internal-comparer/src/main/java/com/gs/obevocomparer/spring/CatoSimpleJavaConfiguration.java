@@ -71,11 +71,11 @@ public class CatoSimpleJavaConfiguration implements CatoConfiguration {
     }
 
     private Factory<Collection<Break>> breakCollectionFactory() {
-        return new CollectionFactory<Break>(ArrayList.class);
+        return new CollectionFactory<>(ArrayList.class);
     }
 
     private Factory<Collection<CatoDataObject>> dataCollectionFactory() {
-        return new CollectionFactory<CatoDataObject>(ArrayList.class);
+        return new CollectionFactory<>(ArrayList.class);
     }
 
     private CatoDataComparator dataComparator() {
@@ -87,7 +87,7 @@ public class CatoSimpleJavaConfiguration implements CatoConfiguration {
     }
 
     public Sort<CatoDataObject> sort() {
-        return new MemorySort<CatoDataObject>(this.dataObjectComparator());
+        return new MemorySort<>(this.dataObjectComparator());
     }
 
     @Override

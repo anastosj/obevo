@@ -49,7 +49,7 @@ public class SimpleTypeConverter implements CatoTypeConverter {
     }
 
     private List<DateFormat> createDateFormats(String[] dateFormatStrs) {
-        List<DateFormat> dateFormats = new ArrayList<DateFormat>();
+        List<DateFormat> dateFormats = new ArrayList<>();
         SimpleDateFormat dateFormat;
 
         for (String format : dateFormatStrs) {

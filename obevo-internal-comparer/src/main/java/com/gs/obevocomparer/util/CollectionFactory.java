@@ -28,7 +28,7 @@ public class CollectionFactory<T> implements Factory<Collection<T>> {
 
     public Collection<T> create() {
         try {
-            return this.collectionClass.newInstance();
+            return this.collectionClass.getDeclaredConstructor().newInstance();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

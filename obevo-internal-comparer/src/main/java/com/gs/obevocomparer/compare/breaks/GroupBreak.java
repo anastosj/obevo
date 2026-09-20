@@ -41,10 +41,6 @@ public class GroupBreak extends AbstractBreak {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("GroupBreak{");
-        sb.append("fields=").append(fields);
-        sb.append(", groupId=").append(groupId);
-        sb.append('}');
-        return sb.toString();
+        return "GroupBreak{fields=" + fields + ", groupId=" + groupId + '}';
     }
 }

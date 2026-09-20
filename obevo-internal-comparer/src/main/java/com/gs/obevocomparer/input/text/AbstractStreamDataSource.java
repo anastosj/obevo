@@ -67,13 +67,10 @@ public abstract class AbstractStreamDataSource extends AbstractCatoDataSource {
     }
 
     protected void openSource() throws Exception {
-        if (this.reader instanceof BufferedReader) {
-            this.bufferedReader = (BufferedReader) this.reader;
-        } else {
-            this.bufferedReader = new BufferedReader(this.reader);
-        }
+        this.bufferedReader = this.reader instanceof BufferedReader bufferedSource
+                ? bufferedSource : new BufferedReader(this.reader);
 
-        this.lines = new LinkedList<String>();
+        this.lines = new LinkedList<>();
         String line;
 
         int stripCount = 0;
@@ -84,7 +81,7 @@ public abstract class AbstractStreamDataSource extends AbstractCatoDataSource {
 
         if (this.hasHeader) {
             for (String field : this.parseData(this.bufferedReader.readLine())) {
-                this.fields.add(field.trim());
+                this.fields.add(field.strip());
             }
             LOG.debug("Set header fields to {}", this.fields.makeString());
         }

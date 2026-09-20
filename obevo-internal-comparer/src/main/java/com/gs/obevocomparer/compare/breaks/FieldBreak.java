@@ -31,7 +31,7 @@ public class FieldBreak extends AbstractBreak {
         super(dataObject, CatoDataSide.LEFT);
         this.fieldBreaks = fieldBreaks;
 
-        this.fieldExcludes = new HashMap<String, Boolean>();
+        this.fieldExcludes = new HashMap<>();
         for (String field : fieldBreaks.keySet()) {
             this.fieldExcludes.put(field, false);
         }

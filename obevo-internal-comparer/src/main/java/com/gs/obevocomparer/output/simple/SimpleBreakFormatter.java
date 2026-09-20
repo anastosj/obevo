@@ -51,8 +51,8 @@ public class SimpleBreakFormatter implements CatoContentFormatter {
 
     public void writeData(CatoComparisonMetadata comparisonMetadata, CatoContentWriter contentWriter) throws IOException {
 
-        Map<String, Set<Integer>> fieldMap = new LinkedHashMap<String, Set<Integer>>();
-        Map<String, String> fieldBreakMap = new LinkedHashMap<String, String>();
+        Map<String, Set<Integer>> fieldMap = new LinkedHashMap<>();
+        Map<String, String> fieldBreakMap = new LinkedHashMap<>();
 
         int fieldCount = this.calculateFieldMaps(comparisonMetadata, fieldMap, fieldBreakMap);
 
@@ -96,9 +96,7 @@ public class SimpleBreakFormatter implements CatoContentFormatter {
             this.setFieldValue(field, br.getDataObject().getValue(field), row, fieldMap);
         }
 
-        if (br instanceof FieldBreak) {
-            FieldBreak fieldBreak = (FieldBreak) br;
-
+        if (br instanceof FieldBreak fieldBreak) {
             for (String field : fieldBreak.getFields()) {
                 this.setFieldValue(fieldBreakMap.get(field), fieldBreak.getExpectedValue(field), row, fieldMap);
                 this.setFieldType(fieldBreakMap.get(field), ValueType.RIGHT_VALUE, row, fieldMap);
@@ -120,8 +118,7 @@ public class SimpleBreakFormatter implements CatoContentFormatter {
             }
         }
 
-        if (br instanceof GroupBreak) {
-            GroupBreak groupBreak = (GroupBreak) br;
+        if (br instanceof GroupBreak groupBreak) {
             breakTypeStr += " group";
             groupId = groupBreak.getGroupId();
 
@@ -190,7 +187,7 @@ public class SimpleBreakFormatter implements CatoContentFormatter {
 
     private int calculateFieldMaps(CatoComparisonMetadata comparisonMetadata, Map<String, Set<Integer>> fieldMap, Map<String, String> fieldBreakMap) {
 
-        Set<String> leftFields = new LinkedHashSet<String>(comparisonMetadata.getLeftFields());
+        Set<String> leftFields = new LinkedHashSet<>(comparisonMetadata.getLeftFields());
         leftFields.addAll(comparisonMetadata.getFieldBreakFields());
 
         String fieldBreakField;
@@ -268,7 +265,7 @@ public class SimpleBreakFormatter implements CatoContentFormatter {
 
     private void addField(String field, int fieldCount, Map<String, Set<Integer>> fieldMap) {
         if (!fieldMap.containsKey(field)) {
-            fieldMap.put(field, new HashSet<Integer>());
+            fieldMap.put(field, new HashSet<>());
         }
 
         fieldMap.get(field).add(fieldCount);

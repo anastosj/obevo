@@ -27,16 +27,12 @@ import org.junit.Test;
 
 public class SortedGroupIteratorTest {
 
-    private final Comparator<Integer> comparator = new Comparator<Integer>() {
-        public int compare(Integer int1, Integer int2) {
-            return int1.compareTo(int2);
-        }
-    };
+    private final Comparator<Integer> comparator = Integer::compareTo;
 
     @Test
     public void testEmpty() {
 
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(Collections.<Integer>emptyList().iterator(), this.comparator);
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(List.<Integer>of().iterator(), this.comparator);
 
         Assert.assertFalse(iter.hasNext());
         Assert.assertEquals(0, iter.next().size());
@@ -45,7 +41,7 @@ public class SortedGroupIteratorTest {
     @Test
     public void testOneElement() {
 
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(Arrays.asList(1).iterator(), this.comparator);
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(Arrays.asList(1).iterator(), this.comparator);
 
         Assert.assertTrue(iter.hasNext());
         List<Integer> group = iter.next();
@@ -59,7 +55,7 @@ public class SortedGroupIteratorTest {
     @Test
     public void testSimpleGroup() {
         List<Integer> values = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(values.iterator(), this.comparator);
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(values.iterator(), this.comparator);
 
         for (int value : values) {
             this.assertGroup(value, 1, iter.next());
@@ -71,7 +67,7 @@ public class SortedGroupIteratorTest {
     @Test
     public void testComplexGroup() {
 
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(
                 Arrays.asList(1, 1, 1, 2, 2, 3, 4, 5, 6, 6, 7, 8, 8).iterator(), this.comparator);
 
         this.assertGroup(1, 3, iter.next());
@@ -90,7 +86,7 @@ public class SortedGroupIteratorTest {
     public void testOutOfOrderGroup() {
 
         TestUtil.clearLogged();
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(
                 Arrays.asList(1, 1, 1, 3, 2, 2, 4, 5).iterator(), this.comparator);
 
         this.assertGroup(1, 3, iter.next());
@@ -104,7 +100,7 @@ public class SortedGroupIteratorTest {
 
     @Test
     public void testRemove() {
-        SortedGroupIterator<Integer> iter = new SortedGroupIterator<Integer>(
+        SortedGroupIterator<Integer> iter = new SortedGroupIterator<>(
                 Arrays.asList(1).iterator(), this.comparator);
         try {
             iter.next();

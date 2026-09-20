@@ -17,7 +17,6 @@ package com.gs.obevocomparer.compare.simple;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -40,16 +39,16 @@ public class SimpleCatoProperties implements CatoProperties {
     private int decimalPrecision;
 
     public SimpleCatoProperties(List<String> keyFields) {
-        this(keyFields, Collections.<String>emptyList());
+        this(keyFields, List.of());
     }
 
     public SimpleCatoProperties(List<String> keyFields, Collection<String> excludeFields) {
 
-        this.keyFields = new LinkedList<String>(keyFields);
-        this.excludeFields = new LinkedHashSet<String>(excludeFields);
+        this.keyFields = new LinkedList<>(keyFields);
+        this.excludeFields = new LinkedHashSet<>(excludeFields);
 
-        this.mappedFields = new HashMap<String, String>();
-        this.breakExcludes = new ArrayList<BreakExclude>();
+        this.mappedFields = new HashMap<>();
+        this.breakExcludes = new ArrayList<>();
         this.decimalPrecision = CatoDataComparator.DEFAULT_DECIMAL_PRECISION;
     }
 
@@ -78,7 +77,7 @@ public class SimpleCatoProperties implements CatoProperties {
             throw new IllegalArgumentException("Must pass an even number of fields to map");
         }
 
-        Map<String, String> mappedFields = new HashMap<String, String>();
+        Map<String, String> mappedFields = new HashMap<>();
         for (int i = 0; i < fields.length; i += 2) {
             mappedFields.put(fields[i], fields[i + 1]);
         }

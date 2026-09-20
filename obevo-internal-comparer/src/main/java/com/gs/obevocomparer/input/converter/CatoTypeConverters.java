@@ -37,13 +37,6 @@ class CatoTypeConverters {
     }
 
     public static CatoTypeConverter newCustomTypeConverter(final Function<Object, Object> customConvertor) {
-        return new CatoTypeConverter() {
-
-            @Override
-            public Object convert(Object data) {
-
-                return customConvertor.valueOf(data);
-            }
-        };
+        return customConvertor::valueOf;
     }
 }

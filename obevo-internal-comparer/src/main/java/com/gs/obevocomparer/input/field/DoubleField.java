@@ -37,7 +37,7 @@ public class DoubleField extends AbstractDerivedField<String> {
     }
 
     protected Object getValue(String sourceValue) {
-        if (this.allowBlanks && sourceValue.trim().length() == 0) {
+        if (this.allowBlanks && sourceValue.isBlank()) {
             return null;
         }
 

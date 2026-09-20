@@ -19,24 +19,15 @@ public class PreciseDoubleStringTypeConverter extends StringTypeConverter {
 
     @Override
     public Object convert(Object value) {
-        if (value == null) {
-            return value;
-        }
-
-        if (value instanceof Double) {
-            Double valueOf = (Double) value;
-
-            valueOf = this.handlePrecision(valueOf);
-            return valueOf;
+        if (value instanceof Double doubleValue) {
+            return this.handlePrecision(doubleValue);
         }
 
         if (!(value instanceof String)) {
             return value;
         }
 
-        Object str = this.handleString(value);
-
-        return str;
+        return this.handleString(value);
     }
 
     public PreciseDoubleStringTypeConverter(int precision, String... dateFormats) {

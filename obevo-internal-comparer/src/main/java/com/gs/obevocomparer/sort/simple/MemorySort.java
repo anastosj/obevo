@@ -16,7 +16,6 @@
 package com.gs.obevocomparer.sort.simple;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +33,12 @@ public class MemorySort<T> implements Sort<T> {
     @Override
     public Iterator<T> sort(Iterator<T> data) {
         List<T> dataList = toList(data);
-        Collections.sort(dataList, this.comparator);
+        dataList.sort(this.comparator);
         return dataList.iterator();
     }
 
     private List<T> toList(Iterator<T> iterator) {
-        List list = new ArrayList();
+        List<T> list = new ArrayList<>();
         while (iterator.hasNext()) {
             list.add(iterator.next());
         }
