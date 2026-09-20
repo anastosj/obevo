@@ -24,7 +24,6 @@ import com.gs.obevo.dbmetadata.api.DaTable;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.list.mutable.ListAdapter;
 import schemacrawler.schema.Column;
@@ -54,7 +53,7 @@ public class DaIndexImpl implements DaIndex {
         this.index = Validate.notNull(index);
         Validate.notNull(schemaStrategy);
         this.columns = ListAdapter.adapt(columns)
-                .collect((Function<Column, DaColumn>) object -> new DaColumnImpl(object, schemaStrategy))
+                .<DaColumn>collect(object -> new DaColumnImpl(object, schemaStrategy))
                 .toImmutable();
         this.schemaStrategy = Validate.notNull(schemaStrategy);
         this.unique = unique;
@@ -91,11 +90,9 @@ public class DaIndexImpl implements DaIndex {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaIndexImpl)) {
+        if (!(o instanceof DaIndexImpl daIndex6)) {
             return false;
         }
-
-        DaIndexImpl daIndex6 = (DaIndexImpl) o;
 
         return index.equals(daIndex6.index);
     }
@@ -115,13 +112,10 @@ public class DaIndexImpl implements DaIndex {
     private static DaIndexType getIndexType(Index index, ExtraIndexInfo extraIndexInfo) {
         if ((extraIndexInfo != null && extraIndexInfo.isClustered()) || index.getIndexType() == clustered) {
             return DaIndexType.CLUSTERED;
-        } else {
-            switch (index.getIndexType()) {
-            case clustered:
-                return DaIndexType.CLUSTERED;
-            default:
-                return DaIndexType.OTHER;
-            }
         }
+        return switch (index.getIndexType()) {
+            case clustered -> DaIndexType.CLUSTERED;
+            default -> DaIndexType.OTHER;
+        };
     }
 }

@@ -50,14 +50,11 @@ public class DaRoutine6Impl implements DaRoutine {
             return routineOverrideValue;
         }
 
-        switch (routine.getRoutineType()) {
-        case function:
-            return DaRoutineType.function;
-        case procedure:
-            return DaRoutineType.procedure;
-        default:
-            return DaRoutineType.unknown;
-        }
+        return switch (routine.getRoutineType()) {
+            case function -> DaRoutineType.function;
+            case procedure -> DaRoutineType.procedure;
+            default -> DaRoutineType.unknown;
+        };
     }
 
     @Override
@@ -75,11 +72,9 @@ public class DaRoutine6Impl implements DaRoutine {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaRoutine6Impl)) {
+        if (!(o instanceof DaRoutine6Impl that)) {
             return false;
         }
-
-        DaRoutine6Impl that = (DaRoutine6Impl) o;
 
         return routine.equals(that.routine);
     }

@@ -36,6 +36,20 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
                 <!-- need to ignore the checkstyle ImportControl check as our schemacrawler wrapper code needs to refer
                 to some packages in schemacrawler itself, which doesn't work well w/ our core file.
                 Would be nice to resolve this eventually -->

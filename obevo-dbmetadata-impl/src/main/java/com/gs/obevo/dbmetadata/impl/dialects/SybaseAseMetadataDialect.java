@@ -37,14 +37,9 @@ import com.gs.obevo.dbmetadata.impl.ExtraRerunnableInfo;
 import com.gs.obevo.dbmetadata.impl.RuleBindingImpl;
 import com.gs.obevo.dbmetadata.impl.SchemaByCatalogStrategy;
 import com.gs.obevo.dbmetadata.impl.SchemaStrategy;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.lang3.ObjectUtils;
-import org.eclipse.collections.api.RichIterable;
-import org.eclipse.collections.api.block.function.Function;
-import org.eclipse.collections.api.block.function.Function2;
-import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.collection.MutableCollection;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -107,12 +102,8 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
 
     @Override
     public void validateDatabase(Catalog database, final PhysicalSchema physicalSchema) {
-        MutableCollection<Schema> schemasWithIncorrectCatalog = CollectionAdapter.adapt(database.getSchemas()).reject(new Predicate<Schema>() {
-            @Override
-            public boolean accept(Schema each) {
-                return each.getCatalogName().equals(physicalSchema.getPhysicalName());
-            }
-        });
+        MutableCollection<Schema> schemasWithIncorrectCatalog = CollectionAdapter.adapt(database.getSchemas())
+                .reject(each -> each.getCatalogName().equals(physicalSchema.getPhysicalName()));
 
         if (schemasWithIncorrectCatalog.notEmpty()) {
             throw new IllegalArgumentException("Returned ASE schemas should be in " + physicalSchema.getPhysicalName() + " catalog; however, these were not: " + schemasWithIncorrectCatalog);
@@ -123,28 +114,25 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
     public ImmutableCollection<RuleBinding> getRuleBindings(DaSchema schema, Connection conn) {
         String schemaName = schema.getName();
         // return the bindings to columns and bindings to domains
-        String sql = "select tab.name 'object', rul.name 'rule', " +
-                "'sp_bindrule ' || rul.name || ', ''' || tab.name || '.' || col.name || '''' 'sql'\n" +
-                "from " + schemaName + "..syscolumns col, " + schemaName + "..sysobjects rul, " + schemaName + "..sysobjects tab\n" +
-                "    , " + schemaName + "..sysusers sch\n" +
-                "where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0\n" +
-                "    and tab.uid = sch.uid and sch.name = '" + schema.getSubschemaName() + "'\n" +
-                "union\n" +
-                "select obj.name 'object', rul.name 'rule', " +
-                "'sp_bindrule ' || rul.name || ', ' || obj.name 'sql'\n" +
-                "from " + schemaName + "..systypes obj, " + schemaName + "..sysobjects rul\n" +
-                "    , " + schemaName + "..sysusers sch\n" +
-                "where obj.domain = rul.id and obj.domain <> 0\n" +
-                "    and obj.uid = sch.uid and sch.name = '" + schema.getSubschemaName() + "'\n";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
+        String sql = """
+                select tab.name 'object', rul.name 'rule', 'sp_bindrule ' || rul.name || ', ''' || tab.name || '.' || col.name || '''' 'sql'
+                from %1$s..syscolumns col, %1$s..sysobjects rul, %1$s..sysobjects tab
+                    , %1$s..sysusers sch
+                where col.domain = rul.id and col.id = tab.id and tab.type='U' and col.domain <> 0
+                    and tab.uid = sch.uid and sch.name = '%2$s'
+                union
+                select obj.name 'object', rul.name 'rule', 'sp_bindrule ' || rul.name || ', ' || obj.name 'sql'
+                from %1$s..systypes obj, %1$s..sysobjects rul
+                    , %1$s..sysusers sch
+                where obj.domain = rul.id and obj.domain <> 0
+                    and obj.uid = sch.uid and sch.name = '%2$s'
+                """.formatted(schemaName, schema.getSubschemaName());
 
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             MutableList<RuleBinding> ruleBindings = Lists.mutable.empty();
             while (rs.next()) {
-                RuleBindingImpl ruleBinding = new RuleBindingImpl();
+                var ruleBinding = new RuleBindingImpl();
                 ruleBinding.setObject(rs.getString("object"));
                 ruleBinding.setRule(rs.getString("rule"));
                 ruleBinding.setSql(rs.getString("sql"));
@@ -153,9 +141,6 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
             return ruleBindings.toImmutable();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            DbUtils.closeQuietly(rs);
-            DbUtils.closeQuietly(ps);
         }
     }
 
@@ -174,63 +159,47 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
                 new MapListHandler()
         )).toImmutable();
 
-        return maps.collect(new Function<Map<String, Object>, ExtraIndexInfo>() {
-            @Override
-            public ExtraIndexInfo valueOf(Map<String, Object> map) {
-                return new ExtraIndexInfo(
-                        (String) map.get("TABLE_NAME"),
-                        (String) map.get("INDEX_NAME"),
-                        (Integer) map.get("IS_CONSTRAINT") != 0,
-                        (Integer) map.get("IS_CLUSTERED") != 0
-                );
-            }
-        });
+        return maps.collect(map -> new ExtraIndexInfo(
+                (String) map.get("TABLE_NAME"),
+                (String) map.get("INDEX_NAME"),
+                (Integer) map.get("IS_CONSTRAINT") != 0,
+                (Integer) map.get("IS_CLUSTERED") != 0
+        ));
     }
 
     @Override
     public ImmutableCollection<ExtraRerunnableInfo> searchExtraViewInfo(DaSchema schema, String tableName, Connection conn) throws SQLException {
-        String query = String.format("select obj.name name, com.number number, colid2 colid2, colid colid, text text\n" +
-                "from %1$s..syscomments com\n" +
-                ", %1$s..sysobjects obj\n" +
-                "    , " + schema.getName() + "..sysusers sch\n" +
-                "where com.id = obj.id\n" +
-                "and com.texttype = 0\n" +
-                "and obj.type in ('V')\n" +
-                "and obj.uid = sch.uid and sch.name = '" + schema.getSubschemaName() + "'\n" +
-                "order by com.id, number, colid2, colid\n", schema.getName());
+        String query = """
+                select obj.name name, com.number number, colid2 colid2, colid colid, text text
+                from %1$s..syscomments com
+                , %1$s..sysobjects obj
+                    , %1$s..sysusers sch
+                where com.id = obj.id
+                and com.texttype = 0
+                and obj.type in ('V')
+                and obj.uid = sch.uid and sch.name = '%2$s'
+                order by com.id, number, colid2, colid
+                """.formatted(schema.getName(), schema.getSubschemaName());
 
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, query, new MapListHandler())).toImmutable();
 
-        ImmutableList<ExtraRerunnableInfo> viewInfos = maps.collect(new Function<Map<String, Object>, ExtraRerunnableInfo>() {
-            @Override
-            public ExtraRerunnableInfo valueOf(Map<String, Object> object) {
-                return new ExtraRerunnableInfo(
-                        (String) object.get("name"),
-                        null,
-                        (String) object.get("text"),
-                        null,
-                        ((Integer) object.get("colid2")).intValue(),
-                        ((Integer) object.get("colid")).intValue()
-                );
-            }
-        });
+        ImmutableList<ExtraRerunnableInfo> viewInfos = maps.collect(object -> new ExtraRerunnableInfo(
+                (String) object.get("name"),
+                null,
+                (String) object.get("text"),
+                null,
+                (Integer) object.get("colid2"),
+                (Integer) object.get("colid")
+        ));
 
-        return viewInfos.groupBy(ExtraRerunnableInfo.TO_NAME).multiValuesView().collect(new Function<RichIterable<ExtraRerunnableInfo>, ExtraRerunnableInfo>() {
-            @Override
-            public ExtraRerunnableInfo valueOf(RichIterable<ExtraRerunnableInfo> objectInfos) {
-                MutableList<ExtraRerunnableInfo> sortedInfos = objectInfos.toSortedList(Comparators.fromFunctions(ExtraRerunnableInfo.TO_ORDER2, ExtraRerunnableInfo.TO_ORDER1));
-                StringBuilder definitionString = sortedInfos.injectInto(new StringBuilder(), new Function2<StringBuilder, ExtraRerunnableInfo, StringBuilder>() {
-                    @Override
-                    public StringBuilder value(StringBuilder sb, ExtraRerunnableInfo rerunnableInfo) {
-                        return sb.append(rerunnableInfo.getDefinition());
-                    }
-                });
-                return new ExtraRerunnableInfo(
-                        sortedInfos.get(0).getName(),
-                        null,
-                        definitionString.toString()
-                );
-            }
+        return viewInfos.groupBy(ExtraRerunnableInfo.TO_NAME).multiValuesView().collect(objectInfos -> {
+            var sortedInfos = objectInfos.toSortedList(Comparators.fromFunctions(ExtraRerunnableInfo.TO_ORDER2, ExtraRerunnableInfo.TO_ORDER1));
+            StringBuilder definitionString = sortedInfos.injectInto(new StringBuilder(), (StringBuilder sb, ExtraRerunnableInfo rerunnableInfo) -> sb.append(rerunnableInfo.getDefinition()));
+            return new ExtraRerunnableInfo(
+                    sortedInfos.get(0).getName(),
+                    null,
+                    definitionString.toString()
+            );
         }).toList().toImmutable();
     }
 
@@ -251,12 +220,7 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
                 new MapListHandler()
         )).toImmutable();
 
-        return maps.collect(new Function<Map<String, Object>, DaRule>() {
-            @Override
-            public DaRule valueOf(Map<String, Object> map) {
-                return new DaRuleImpl((String) map.get("RULE_NAME"), schema);
-            }
-        });
+        return maps.collect(map -> new DaRuleImpl((String) map.get("RULE_NAME"), schema));
     }
 
     @Override
@@ -270,66 +234,51 @@ public class SybaseAseMetadataDialect extends AbstractMetadataDialect {
                 , new MapListHandler()
         )).toImmutable();
 
-        return maps.collect(new Function<Map<String, Object>, DaUserType>() {
-            @Override
-            public DaUserType valueOf(Map<String, Object> map) {
-                return new DaUserTypeImpl((String) map.get("USER_TYPE_NAME"), schema);
-            }
-        });
+        return maps.collect(map -> new DaUserTypeImpl((String) map.get("USER_TYPE_NAME"), schema));
     }
 
     @Override
     public ImmutableCollection<DaRoutine> searchExtraRoutines(final DaSchema schema, String procedureName, Connection conn) throws SQLException {
         String nameClause = procedureName != null ? "and obj.name = '" + procedureName + "'\n" : "";
 
-        String query = String.format("select obj.name name, obj.type type, com.number number, colid2 colid2, colid colid, text text\n" +
-                "from %1$s..syscomments com\n" +
-                ", %1$s..sysobjects obj\n" +
-                "    , " + schema.getName() + "..sysusers sch\n" +
-                "where com.id = obj.id\n" +
-                "and com.texttype = 0\n" +
-                "and obj.uid = sch.uid and sch.name = '" + schema.getSubschemaName() + "'\n" +
-                "and obj.type in ('SF', 'P')\n" +
-                nameClause +
-                "order by com.id, number, colid2, colid\n", schema.getName());
+        String query = """
+                select obj.name name, obj.type type, com.number number, colid2 colid2, colid colid, text text
+                from %1$s..syscomments com
+                , %1$s..sysobjects obj
+                    , %1$s..sysusers sch
+                where com.id = obj.id
+                and com.texttype = 0
+                and obj.uid = sch.uid and sch.name = '%2$s'
+                and obj.type in ('SF', 'P')
+                %3$sorder by com.id, number, colid2, colid
+                """.formatted(schema.getName(), schema.getSubschemaName(), nameClause);
 
         ImmutableList<Map<String, Object>> maps = ListAdapter.adapt(jdbc.query(conn, query, new MapListHandler())).toImmutable();
 
-        ImmutableList<ExtraRerunnableInfo> routineInfos = maps.collect(new Function<Map<String, Object>, ExtraRerunnableInfo>() {
-            @Override
-            public ExtraRerunnableInfo valueOf(Map<String, Object> object) {
-                String basename = (String) object.get("name");
-                int number = ((Integer) object.get("number")).intValue();
-                String specificName = number > 1 ? basename + ";" + number : basename;
-                return new ExtraRerunnableInfo(
-                        basename,
-                        specificName,
-                        (String) object.get("text"),
-                        ((String) object.get("type")).trim(),
-                        ((Integer) object.get("colid2")).intValue(),
-                        ((Integer) object.get("colid")).intValue()
-                );
-            }
+        ImmutableList<ExtraRerunnableInfo> routineInfos = maps.collect(object -> {
+            var basename = (String) object.get("name");
+            int number = (Integer) object.get("number");
+            String specificName = number > 1 ? basename + ";" + number : basename;
+            return new ExtraRerunnableInfo(
+                    basename,
+                    specificName,
+                    (String) object.get("text"),
+                    ((String) object.get("type")).trim(),
+                    (Integer) object.get("colid2"),
+                    (Integer) object.get("colid")
+            );
         });
 
-        return routineInfos.groupBy(ExtraRerunnableInfo.TO_SPECIFIC_NAME).multiValuesView().collect(new Function<RichIterable<ExtraRerunnableInfo>, DaRoutine>() {
-            @Override
-            public DaRoutine valueOf(RichIterable<ExtraRerunnableInfo> objectInfos) {
-                MutableList<ExtraRerunnableInfo> sortedInfos = objectInfos.toSortedList(Comparators.fromFunctions(ExtraRerunnableInfo.TO_ORDER2, ExtraRerunnableInfo.TO_ORDER1));
-                StringBuilder definitionString = sortedInfos.injectInto(new StringBuilder(), new Function2<StringBuilder, ExtraRerunnableInfo, StringBuilder>() {
-                    @Override
-                    public StringBuilder value(StringBuilder sb, ExtraRerunnableInfo rerunnableInfo) {
-                        return sb.append(rerunnableInfo.getDefinition());
-                    }
-                });
-                return new DaRoutinePojoImpl(
-                        sortedInfos.get(0).getName(),
-                        schema,
-                        sortedInfos.get(0).getType().equals("P") ? DaRoutineType.procedure : DaRoutineType.function,
-                        sortedInfos.get(0).getSpecificName(),
-                        definitionString.toString()
-                );
-            }
+        return routineInfos.groupBy(ExtraRerunnableInfo.TO_SPECIFIC_NAME).multiValuesView().collect(objectInfos -> {
+            var sortedInfos = objectInfos.toSortedList(Comparators.fromFunctions(ExtraRerunnableInfo.TO_ORDER2, ExtraRerunnableInfo.TO_ORDER1));
+            StringBuilder definitionString = sortedInfos.injectInto(new StringBuilder(), (StringBuilder sb, ExtraRerunnableInfo rerunnableInfo) -> sb.append(rerunnableInfo.getDefinition()));
+            return (DaRoutine) new DaRoutinePojoImpl(
+                    sortedInfos.get(0).getName(),
+                    schema,
+                    sortedInfos.get(0).getType().equals("P") ? DaRoutineType.procedure : DaRoutineType.function,
+                    sortedInfos.get(0).getSpecificName(),
+                    definitionString.toString()
+            );
         }).toList().toImmutable();
     }
 

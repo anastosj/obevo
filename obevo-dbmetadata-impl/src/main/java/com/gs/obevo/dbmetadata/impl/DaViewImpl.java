@@ -98,11 +98,9 @@ public class DaViewImpl implements DaView {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaViewImpl)) {
+        if (!(o instanceof DaViewImpl daView6)) {
             return false;
         }
-
-        DaViewImpl daView6 = (DaViewImpl) o;
 
         return view.equals(daView6.view);
     }

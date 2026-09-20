@@ -46,11 +46,9 @@ public class DaColumnReferenceImpl implements DaColumnReference {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaColumnReferenceImpl)) {
+        if (!(o instanceof DaColumnReferenceImpl that)) {
             return false;
         }
-
-        DaColumnReferenceImpl that = (DaColumnReferenceImpl) o;
 
         return fkColumnReference.equals(that.fkColumnReference);
     }

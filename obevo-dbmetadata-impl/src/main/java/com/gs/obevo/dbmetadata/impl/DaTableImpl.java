@@ -46,18 +46,13 @@ public class DaTableImpl implements DaTable {
     private final SchemaStrategy schemaStrategy;
 
     public DaTableImpl(Table table, SchemaStrategy schemaStrategy) {
-        this(table, schemaStrategy, Multimaps.immutable.list.<String, ExtraIndexInfo>empty());
+        this(table, schemaStrategy, Multimaps.immutable.list.empty());
     }
 
     public DaTableImpl(Table table, SchemaStrategy schemaStrategy, Multimap<String, ExtraIndexInfo> extraIndexes) {
         this.table = Validate.notNull(table);
         this.schemaStrategy = schemaStrategy;
-        this.extraIndexInfoMap = extraIndexes.get(table.getName()).groupByUniqueKey(new Function<ExtraIndexInfo, String>() {
-            @Override
-            public String valueOf(ExtraIndexInfo extraIndexInfo) {
-                return extraIndexInfo.getIndexName();
-            }
-        });
+        this.extraIndexInfoMap = extraIndexes.get(table.getName()).groupByUniqueKey(ExtraIndexInfo::getIndexName);
     }
 
     @Override
@@ -72,12 +67,9 @@ public class DaTableImpl implements DaTable {
 
     @Override
     public ImmutableList<DaColumn> getColumns() {
-        return ListAdapter.adapt(table.getColumns()).collect(new Function<Column, DaColumn>() {
-            @Override
-            public DaColumn valueOf(Column object) {
-                return (DaColumn) new DaColumnImpl(object, schemaStrategy);
-            }
-        }).toImmutable();
+        return ListAdapter.adapt(table.getColumns())
+                .<DaColumn>collect(object -> new DaColumnImpl(object, schemaStrategy))
+                .toImmutable();
     }
 
     @Override
@@ -98,18 +90,10 @@ public class DaTableImpl implements DaTable {
     @Override
     public ImmutableCollection<DaIndex> getIndices() {
         return CollectionAdapter.adapt(table.getIndexes())
-                .collect(new Function<Index, DaIndex>() {
-                    @Override
-                    public DaIndex valueOf(Index object) {
-                        return new DaIndexImpl(object, schemaStrategy, extraIndexInfoMap.get(object.getName()));
-                    }
-                })
-                .reject(new Predicate<DaIndex>() {
-                    @Override
-                    public boolean accept(DaIndex index) {
-                        ExtraIndexInfo extraIndexInfo = extraIndexInfoMap.get(index.getName());
-                        return extraIndexInfo != null && extraIndexInfo.isConstraint();
-                    }
+                .<DaIndex>collect(object -> new DaIndexImpl(object, schemaStrategy, extraIndexInfoMap.get(object.getName())))
+                .reject(index -> {
+                    ExtraIndexInfo extraIndexInfo = extraIndexInfoMap.get(index.getName());
+                    return extraIndexInfo != null && extraIndexInfo.isConstraint();
                 })
                 .toImmutable();
     }
@@ -117,12 +101,8 @@ public class DaTableImpl implements DaTable {
     @Override
     public ImmutableCollection<DaForeignKey> getImportedForeignKeys() {
         return CollectionAdapter.adapt(table.getImportedForeignKeys())
-                .collect(new Function<ForeignKey, DaForeignKey>() {
-                    @Override
-                    public DaForeignKey valueOf(ForeignKey object) {
-                        return new DaForeignKeyImpl(object, schemaStrategy);
-                    }
-                }).toImmutable();
+                .<DaForeignKey>collect(object -> new DaForeignKeyImpl(object, schemaStrategy))
+                .toImmutable();
     }
 
     @Override
@@ -135,11 +115,9 @@ public class DaTableImpl implements DaTable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaTableImpl)) {
+        if (!(o instanceof DaTableImpl daTable6)) {
             return false;
         }
-
-        DaTableImpl daTable6 = (DaTableImpl) o;
 
         return table.equals(daTable6.table);
     }

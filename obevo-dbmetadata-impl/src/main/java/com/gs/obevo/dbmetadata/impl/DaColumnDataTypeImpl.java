@@ -43,11 +43,9 @@ public class DaColumnDataTypeImpl implements DaColumnDataType {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DaColumnDataTypeImpl)) {
+        if (!(o instanceof DaColumnDataTypeImpl that)) {
             return false;
         }
-
-        DaColumnDataTypeImpl that = (DaColumnDataTypeImpl) o;
 
         return columnDataType.equals(that.columnDataType);
     }
