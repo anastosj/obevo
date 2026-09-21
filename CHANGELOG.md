@@ -1,5 +1,12 @@
 # Change Log
 
+## Unreleased
+
+### Technical Improvements
+
+Java 17 baseline: maven-compiler-plugin now compiles with `<release>17</release>` (plugin upgraded to 3.11.0) and the enforcer requires JDK 17+
+
+
 ## 8.2.0
 
 ### Functionality Improvements
