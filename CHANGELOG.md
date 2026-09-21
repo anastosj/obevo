@@ -14,6 +14,8 @@ Upgrading dependencies to avoid dependency vulnerability issues (notably for Apa
 
 Added MSSQL to the list of platforms to clarify that it is an option
 
+Added unit tests for the CollectionUtil and FileFilterUtils utility classes in obevo-core
+
 
 ## 8.1.1
 

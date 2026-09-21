@@ -13,6 +13,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+// Portions copyright Jonathan Anastos. Licensed under Apache 2.0 license
+*/
 package com.gs.obevo.util.vfs;
 
 import org.apache.commons.vfs2.FileFilter;
