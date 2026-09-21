@@ -32,14 +32,13 @@ This product depends on (links to) the following software:
   JGraphT - I/O under GNU Lesser General Public License Version 2.1, February 1999 or Eclipse Public License (EPL) 2.0
   JHeaps under Apache License, Version 2.0
   Joda time under Apache 2
+  Kotlin Stdlib under The Apache License, Version 2.0
+  Kotlin Stdlib Jdk7 under The Apache License, Version 2.0
+  Kotlin Stdlib Jdk8 under The Apache License, Version 2.0
   obevo-core under The Apache License, Version 2.0
   obevo-db under The Apache License, Version 2.0
   obevo-internal-comparer under The Apache License, Version 2.0
   opencsv under Apache 2
-  org.jetbrains.kotlin:kotlin-stdlib under The Apache License, Version 2.0
-  org.jetbrains.kotlin:kotlin-stdlib-common under The Apache License, Version 2.0
-  org.jetbrains.kotlin:kotlin-stdlib-jdk7 under The Apache License, Version 2.0
-  org.jetbrains.kotlin:kotlin-stdlib-jdk8 under The Apache License, Version 2.0
   SchemaCrawler under Eclipse Public License - v 1.0
   SchemaCrawler for HyperSQL under Eclipse Public License - v 1.0
   SchemaCrawler for IBM DB2 under Eclipse Public License - v 1.0

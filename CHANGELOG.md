@@ -6,6 +6,8 @@
 
 Build now requires JDK 17: all modules compile with `--release 17`, the JDK 8 CI job and the Java 8 API check (animal-sniffer) are removed
 
+Build tooling upgraded for JDK 17: Kotlin 1.9.25 (`jvmTarget` 17), maven-surefire/failsafe 3.2.5, maven-enforcer 3.5.0 (extra-enforcer-rules 1.9.0), maven-javadoc 3.6.3, maven-source 3.3.1
+
 ## 8.2.0
 
 ### Functionality Improvements
