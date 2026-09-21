@@ -25,4 +25,4 @@ then
     docker rm $OLD_CONTAINER_ID
 fi
 
-docker run --name $CONTAINER_NAME -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
+docker run --name $CONTAINER_NAME -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres:15

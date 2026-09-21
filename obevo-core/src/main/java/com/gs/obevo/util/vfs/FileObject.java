@@ -48,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
  * See FileRetrievalModeTest for the tests on this class.
  */
 public class FileObject implements org.apache.commons.vfs2.FileObject {
-    static FileObject toDaFileObject(org.apache.commons.vfs2.FileObject fileObject) {
+    public static FileObject toDaFileObject(org.apache.commons.vfs2.FileObject fileObject) {
         return fileObject == null ? null : new FileObject(fileObject);
     }
 

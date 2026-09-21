@@ -29,7 +29,7 @@
 
     <properties>
         <maven.version>2.2.1</maven.version>
-        <maven.plugin.version>3.5</maven.plugin.version>
+        <maven.plugin.version>3.6.4</maven.plugin.version>
     </properties>
 
     <build>

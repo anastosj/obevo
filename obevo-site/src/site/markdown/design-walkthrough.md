@@ -460,7 +460,6 @@ work with both stateful and stateless changes.
                     <li>Each file has the set of changes intended for the upcoming migration.</li>
                     <li>Each file may span multiple database objects, and we can have multiple files for a migration.</li>
                 </ul>
-
                 Example:
                 <ul>
                     <li>Original creation statements in version 1 (V1). Subsequent versions have followup updates</li>
@@ -477,7 +476,6 @@ work with both stateful and stateless changes.
                     <li>An object requiring stateless changes would only have one Change defined, which would be re-deployed for each change.</li>
                     <li>This ties closely to how object-oriented languages maintain their code, e.g. Java having one-file-per-class</li>
                 </ul>
-
                 Example:
                 <ul>
                     <li>The
