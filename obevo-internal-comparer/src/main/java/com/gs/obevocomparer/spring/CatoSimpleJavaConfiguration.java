@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
+import javax.annotation.Resource;
+
 import com.gs.obevocomparer.compare.CatoBreakExcluder;
 import com.gs.obevocomparer.compare.CatoDataComparator;
 import com.gs.obevocomparer.compare.CatoDataSourceComparator;
@@ -42,7 +44,9 @@ import com.gs.obevocomparer.util.Factory;
  * Spring config class to keep the original name for backwards-compatibility
  */
 public class CatoSimpleJavaConfiguration implements CatoConfiguration {
-    private CatoProperties properties;
+    @Resource  // we keep the resource annotation here to help w/ the Spring config subclass, and it is harmless here
+    private
+    CatoProperties properties;
 
     public CatoSimpleJavaConfiguration() {
     }

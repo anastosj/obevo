@@ -49,6 +49,7 @@ import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.Timestamp
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * AuditDao that will write the audit to the same db schema as the Change audit
@@ -65,8 +66,15 @@ class SameSchemaChangeAuditDao(private val env: DbEnvironment, private val sqlEx
     private val insertDeployExecutionIdColumn: String
     private val updateDeployExecutionIdColumn: String
 
+    private val lastTimestampMillis = AtomicLong()
+
+    /**
+     * Strictly increasing within this instance, so that the TIME_INSERTED order of the audit rows written by a deploy
+     * matches the deploy order even when several rows are written within the same millisecond (orderWithinObject is
+     * backfilled from TIME_INSERTED when reading the audit table).
+     */
     private val currentTimestamp: Timestamp
-        get() = Timestamp(DateTime().millis)
+        get() = Timestamp(lastTimestampMillis.updateAndGet { prev -> Math.max(prev + 1, DateTime().millis) })
 
     init {
 

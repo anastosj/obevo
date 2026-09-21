@@ -8,7 +8,7 @@ you read our [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) before y
 
 Obevo's development environment relies on the following:
 
-### 1) Java 8 for build, and Java 7 for runtime / usage
+### 1) Java 17 for build and runtime / usage
 
 To obtain for:
 * MacOS: use the Homebrew package manager
@@ -17,12 +17,9 @@ To obtain for:
 ** [OpenJDK Download](http://openjdk.java.net/install/)
 
 Note:
-* Language: Java 7 syntax and Kotlin (compiling Kotlin to Java 6 bytecode).
-* The Obevo binary byte code is in Java 7, so Java 7 users can still leverage Obevo.
-* We do still need Java 8 for build-time as the Kotlin libraries need Java 8 to run.
-* To enforce Java 7 compatibility, we use:
-** [Animal Sniffer plugin](https://www.mojohaus.org/animal-sniffer/) to ensure that we do not refer to any JDK 8 APIs
-** Tests against the Java 7 binary in Travis CI
+* Language: Java 17 and Kotlin (compiling Kotlin to Java 17 bytecode).
+* The Obevo binary byte code targets Java 17, so Java 17 or higher is required to build and run Obevo.
+* The Maven Enforcer plugin fails the build if it is run with an older JDK.
 
 ### 2) Maven 3.3.1 or higher
 

@@ -44,7 +44,7 @@ class DbDirectoryChangesetReader : FileSourceContext {
 
     private val convertDbObjectName: Function<String, String>
     private val packageMetadataReader: PackageMetadataReader
-    private val packageMetadataCache = ConcurrentHashMap<FileName, PackageMetadata>()
+    private val packageMetadataCache = ConcurrentHashMap<Pair<FileName, String>, PackageMetadata>()
     private val tableChangeParser: DbChangeFileParser
     private val baselineTableChangeParser: DbChangeFileParser?
     private val rerunnableChangeParser: DbChangeFileParser
@@ -255,7 +255,7 @@ class DbDirectoryChangesetReader : FileSourceContext {
     private fun getPackageMetadata(file: FileObject, sourceEncoding: String): PackageMetadata? {
         // resolve the parent via the file system; FileObject.getParent() is not thread-safe in commons-vfs2 2.0
         val parentName = file.name.parent
-        return packageMetadataCache.getIfAbsentPut(parentName, Function0<PackageMetadata> {
+        return packageMetadataCache.getIfAbsentPut(Pair(parentName, sourceEncoding), Function0<PackageMetadata> {
             val packageMetadataFile = FileObject.toDaFileObject(file.fileSystem.resolveFile(parentName)).getChild("package-info.txt")
 
             // we check for containsKey, as we may end up persisting null as the value in the map
