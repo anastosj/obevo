@@ -14,6 +14,10 @@ Upgrading dependencies to avoid dependency vulnerability issues (notably for Apa
 
 Added MSSQL to the list of platforms to clarify that it is an option
 
+### Bug Fixes
+
+Sybase ASE ddlgen reverse-engineering instructions no longer echo the supplied password; a `<password>` placeholder is printed instead
+
 
 ## 8.1.1
 
