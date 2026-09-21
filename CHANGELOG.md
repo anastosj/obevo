@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+### Technical Improvements
+
+Added unit test coverage for com.gs.obevo.util.CollectionUtil
+
 ## 8.2.0
 
 ### Functionality Improvements
