@@ -183,7 +183,7 @@ class RevengWriter {
                 tableNames: MutableSet<String>): Predicate2<File, RevEngDestination> {
             return Predicate2 { mainFile, dbFileRep ->
                 !mainFile.exists() || tableNames.collect(StringFunctions.toLowerCase()).contains(
-                        dbFileRep.objectName.toLowerCase())
+                        dbFileRep.objectName.lowercase())
             }
         }
     }

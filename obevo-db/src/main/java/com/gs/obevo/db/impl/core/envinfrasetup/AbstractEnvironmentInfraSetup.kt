@@ -157,12 +157,12 @@ open class AbstractEnvironmentInfraSetup(
 
         LOG.debug("{} objects existing in DB: {}", objectTypeName, existingObjects)
 
-        val existingObjectNames = existingObjects.collect(getDbObjectName).collect { s -> s.toLowerCase() }.toSet().toImmutable()
+        val existingObjectNames = existingObjects.collect(getDbObjectName).collect { s -> s.lowercase() }.toSet().toImmutable()
 
         val sourceObjects = getSourceObjects(env)
         LOG.debug("{} objects from configuration: {}", objectTypeName, sourceObjects)
 
-        val missingObjects = sourceObjects.reject { existingObjectNames.contains(getSourceObjectName(it).toLowerCase()) }
+        val missingObjects = sourceObjects.reject { existingObjectNames.contains(getSourceObjectName(it).lowercase()) }
 
         if (forceCreation) {
             for (missingObject in missingObjects) {

@@ -6,6 +6,8 @@
 
 Build now requires JDK 17: all modules compile with `--release 17`, the JDK 8 CI job and the Java 8 API check (animal-sniffer) are removed
 
+Kotlin upgraded from 1.3.61 to 1.9.25 and the Kotlin build target moved from JVM 1.6 to JVM 17 (IntelliJ `.iml` files updated to JDK 17 / Kotlin 1.9 to match), completing the Java 17 migration
+
 ## 8.2.0
 
 ### Functionality Improvements

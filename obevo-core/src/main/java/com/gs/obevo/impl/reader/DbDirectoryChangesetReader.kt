@@ -138,7 +138,7 @@ class DbDirectoryChangesetReader : FileSourceContext {
         if (dir != null && dir.exists()) {
             return dir
         }
-        dir = schemaDir.getChild(changeType.directoryName.toUpperCase())
+        dir = schemaDir.getChild(changeType.directoryName.uppercase())
         if (dir != null && dir.exists()) {
             return dir
         }
@@ -219,7 +219,7 @@ class DbDirectoryChangesetReader : FileSourceContext {
         )
 
         val candidateFiles = listOf(*dir.findFiles(positiveSelector))
-        val extensionPartition = candidateFiles.partition { acceptedExtensions.contains(it.name.extension.toLowerCase()) }
+        val extensionPartition = candidateFiles.partition { acceptedExtensions.contains(it.name.extension.lowercase()) }
 
         if (extensionPartition.second.isNotEmpty()) {
             val message = "Found unexpected file extensions (these will not be deployed!) in directory " + dir + "; expects extensions [" + acceptedExtensions + "], found: " + extensionPartition.second
