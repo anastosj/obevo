@@ -29,7 +29,6 @@ import org.eclipse.collections.api.block.predicate.Predicate2
 import org.eclipse.collections.api.list.MutableList
 import org.eclipse.collections.api.set.MutableSet
 import org.eclipse.collections.impl.block.factory.HashingStrategies
-import org.eclipse.collections.impl.block.factory.StringFunctions
 import org.eclipse.collections.impl.factory.HashingStrategyMaps
 import org.eclipse.collections.impl.factory.Lists
 import org.eclipse.collections.impl.factory.Maps
@@ -182,7 +181,7 @@ class RevengWriter {
         fun overwriteForSpecificTablesPredicate(
                 tableNames: MutableSet<String>): Predicate2<File, RevEngDestination> {
             return Predicate2 { mainFile, dbFileRep ->
-                !mainFile.exists() || tableNames.collect(StringFunctions.toLowerCase()).contains(
+                !mainFile.exists() || tableNames.collect { it.lowercase() }.contains(
                         dbFileRep.objectName.lowercase())
             }
         }
