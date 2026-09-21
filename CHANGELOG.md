@@ -4,6 +4,8 @@
 
 ### Functionality Improvements
 
+Sybase ASE ddlgen reverse-engineering instructions no longer echo the supplied password; a `<password>` placeholder is printed instead
+
 Updated the MSSQL reverse engineer PS script to interpret null username and password as integrated auth when creating the connection object
 
 ### Technical Improvements
