@@ -145,7 +145,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
@@ -297,8 +297,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -426,7 +425,7 @@
                             <rules>
                                 <reactorModuleConvergence />
                                 <requireJavaVersion>
-                                    <version>1.7.0</version>
+                                    <version>[17,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>3.5.0</version>
