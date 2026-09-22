@@ -64,7 +64,7 @@ do
         exit 6
     fi
 
-    docker exec -ti $CONTAINER_NAME bash -c "su - $INSTANCE_USERID -c 'db2 connect to $INSTANCE_DBNAME'" && RETVAL=$? || RETVAL=$?
+    docker exec -i $CONTAINER_NAME bash -c "su - $INSTANCE_USERID -c 'db2 connect to $INSTANCE_DBNAME'" && RETVAL=$? || RETVAL=$?
 
     if [ $RETVAL -eq 0 ]; then
         echo "DB started"

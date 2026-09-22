@@ -35,7 +35,8 @@ class Changeset(
         get() = !this.inserts.isEmpty || !this.auditChanges.isEmpty
 
     fun applyDeferredPredicate(deferredChangePredicate: Predicate<in ExecuteChangeCommand>?): Changeset {
-        val partition = inserts.partition(deferredChangePredicate ?: DEFAULT_DEFERRED_PREDICATE);
+        val predicate: Predicate<in ExecuteChangeCommand> = deferredChangePredicate ?: DEFAULT_DEFERRED_PREDICATE
+        val partition = inserts.partition(predicate)
         return Changeset(partition.selected, deferredChanges.newWithAll(partition.rejected), auditChanges, changeWarnings)
     }
 

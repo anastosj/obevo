@@ -23,7 +23,7 @@ INSTANCE_DBNAME="dbdeploy"
 INSTANCE_USERID="sa"  # note - this user ID is hardcoded by the container
 INSTANCE_PASSWORD="Deploybuilddb0!"
 
-CONTAINER_IMAGE="microsoft/mssql-server-linux:2017-latest"
+CONTAINER_IMAGE="mcr.microsoft.com/mssql/server:2017-latest"
 CONTAINER_NAME=obevo-mssql-instance
 
 OLD_CONTAINER_ID=$(docker ps -aqf "name=$CONTAINER_NAME")

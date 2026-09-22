@@ -33,7 +33,7 @@ Steps to use this:
 |DBMS|Module|Script|Docker Image|
 |----|------|------|----------------|
 |DB2|obevo-db-db2|db2-setup.sh|[DB2 Express](https://hub.docker.com/r/ibmcom/db2express-c/)|
-|MSSQL|obevo-db-mssql|mssql-setup.sh|[MSSQL Server on Linux](https://hub.docker.com/r/microsoft/mssql-server-linux/)|
+|MSSQL|obevo-db-mssql|mssql-setup.sh|[MSSQL Server on Linux](https://mcr.microsoft.com/en-us/artifact/mar/mssql/server)|
 |POSTGRESQL|obevo-db-postgresql|postgresql-setup.sh|[PostgreSQL image](https://hub.docker.com/_/postgres/)|
 
 The setup script will do the following:

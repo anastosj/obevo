@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+### Technical Improvements
+
+Upgraded the build and runtime baseline from Java 8 to Java 17 (Kotlin 1.9, Mockito 4, Eclipse Collections 11, Hibernate 5.6, mssql-jdbc 9.4). Java 17 or higher is now required to build and run Obevo.
+
 ## 8.2.0
 
 ### Functionality Improvements
