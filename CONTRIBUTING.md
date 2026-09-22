@@ -21,7 +21,7 @@ Note:
 * The Obevo binary byte code targets Java 17, so Java 17 or higher is required to build and run Obevo.
 * The Maven Enforcer plugin fails the build if it is run with an older JDK.
 
-### 2) Maven 3.3.1 or higher
+### 2) Maven 3.6.3 or higher
 
 [Download](https://maven.apache.org/download.cgi)
 
