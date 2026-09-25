@@ -30,7 +30,7 @@ import org.eclipse.collections.impl.set.mutable.SetAdapter;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -51,7 +51,7 @@ public class Db2SqlExecutorTest {
         // In the test setup, we duplicate sB across the JDBC "set path" return result and the schemas defined in the config to ensure that we drop the dupes in the final output
         JdbcHelper jdbc = mock(JdbcHelper.class);
         Connection conn = mock(Connection.class);
-        when(jdbc.query(Matchers.any(Connection.class), Matchers.anyString(), Matchers.<ResultSetHandler<Object>>any())).thenReturn("s3,\"s1\",\"sB\",s2");
+        when(jdbc.query(ArgumentMatchers.any(Connection.class), ArgumentMatchers.anyString(), ArgumentMatchers.<ResultSetHandler<Object>>any())).thenReturn("s3,\"s1\",\"sB\",s2");
 
         // Use LinkedHashSet just to make the test setup easy
         LinkedHashSet<PhysicalSchema> schemas = new LinkedHashSet<PhysicalSchema>(Arrays.asList(new PhysicalSchema("sA"), new PhysicalSchema("sB"), new PhysicalSchema("sC")));

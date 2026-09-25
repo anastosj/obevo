@@ -1,5 +1,12 @@
 # Change Log
 
+## Unreleased
+
+### Technical Improvements
+
+JDK 17 dependency upgrades (KAN-10): Eclipse Collections 7.0.2 -> 11.1.0 (7.x reflects into `ArrayList.elementData`, which JDK 17 strong encapsulation rejects), Mockito 1.8.2 -> 4.11.0 (cglib -> Byte Buddy), JUnit 4.11 -> 4.13.2, mssql-jdbc 6.1.0.jre7 -> 12.8.1.jre8; `javax.annotation-api` added for `@Resource` since the `java.xml.ws.annotation` module was removed from the JDK. No `--add-opens`/`--add-exports` were needed in surefire/failsafe.
+
+
 ## 8.2.0
 
 ### Functionality Improvements
