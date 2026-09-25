@@ -136,7 +136,6 @@ public class DbMergeInfo {
                 .append("driverClassName", driverClassName)
                 .append("url", url)
                 .append("username", username)
-                .append("password", password)
                 .append("physicalSchema", physicalSchema)
                 .toString();
     }
