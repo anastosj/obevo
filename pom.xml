@@ -120,7 +120,7 @@
 
         <!-- common dependency version properties -->
         <slf4j.version>1.7.18</slf4j.version>
-        <eclipsecollections.version>7.0.2</eclipsecollections.version>
+        <eclipsecollections.version>11.1.0</eclipsecollections.version>
 
         <extra-enforcer-rules.version>1.0-beta-6</extra-enforcer-rules.version>
 
@@ -473,6 +473,10 @@
                                             </ignoreClasses>
                                         </dependency>
                                     </dependencies>
+                                    <ignoreClasses>
+                                        <!-- multi-release jars each carry their own module descriptor -->
+                                        <ignoreClass>META-INF/versions/*/module-info</ignoreClass>
+                                    </ignoreClasses>
                                     <findAllDuplicates>true</findAllDuplicates>
                                 </banDuplicateClasses>
                             </rules>
@@ -542,6 +546,7 @@
                         <exclude>**/NOTICE.template.txt</exclude>
                         <exclude>**/README.md</exclude>
                         <exclude>**/SDLC_NOTES.md</exclude>
+                        <exclude>**/MIGRATION_NOTES.md</exclude>
                         <exclude>**/deploy/*.asc</exclude>
                         <exclude>**/deploy/*.asc.*</exclude>
                         <exclude>**/node_modules/**</exclude>
