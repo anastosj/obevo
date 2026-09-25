@@ -12,7 +12,7 @@ relied on JDK modules removed after Java 8. All versions are managed in
 | `org.eclipse.collections:*` | 7.0.2 | 11.1.0 | 7.x reflects into `java.util.ArrayList.elementData`; JDK 17 throws `InaccessibleObjectException` (`java.base` does not open `java.util`) |
 | `org.mockito:mockito-core` | 1.8.2 | 4.11.0 | cglib-based proxying fails at class-init on JDK 17; 4.x uses Byte Buddy. Tests moved from `org.mockito.Matchers` to `org.mockito.ArgumentMatchers` |
 | `junit:junit` | 4.11 | 4.13.2 | required by Mockito 4 / hamcrest alignment |
-| `com.microsoft.sqlserver:mssql-jdbc` | 6.1.0.jre7 | 12.8.1.jre8 | 6.x predates JDK 9+ support |
+| `com.microsoft.sqlserver:mssql-jdbc` | 6.1.0.jre7 | 9.4.1.jre8 | 6.x predates JDK 9+ support; 9.4.1 is the last line with `encrypt=false` by default (10.x+ flips it on and rejects self-signed certs) |
 | `javax.annotation:javax.annotation-api` | — | 1.3.2 | `javax.annotation.Resource` (used by `obevo-internal-comparer`) left the JDK with the `java.xml.ws.annotation` module |
 
 ## Encapsulation

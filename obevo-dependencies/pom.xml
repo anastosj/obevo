@@ -375,7 +375,7 @@
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>mssql-jdbc</artifactId>
-                <version>12.8.1.jre8</version>
+                <version>9.4.1.jre8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.microsoft.azure</groupId>
