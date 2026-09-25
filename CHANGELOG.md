@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+### Bug Fixes
+
+Removed the database password from `DbMergeInfo.toString()` so the reverse-engineering merge tool no longer writes credentials to its log
+
 ## 8.2.0
 
 ### Functionality Improvements
